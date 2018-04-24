@@ -1,0 +1,11 @@
+Pretty much need that app, renamed to “DPOS Monitor Tool”, with the ability to monitor different servers on different networks
+
+ 
+
+(Under “Settings” in the app it allows you to enter a custom server which is fine)
+
+ 
+
+Maybe the home screen of the app could have a dashboard, listing all the different servers you’ve added with a traffic light system that tells you if the added server as forged or not, and if it hasn’t, it pushes a notification to the phone.
+
+(Pretty sure there’s API’s that you can use to tell if the server has forged or not, as all the info is available in explorers; For Ark, it’s available here.  https://explorer.ark.io/delegate-monitor  - Full disclosure, my server is called pieface. )
