@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/DPoS-Monitor-Tool.iml" filepath="$PROJECT_DIR$/DPoS-Monitor-Tool.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ark-android-monitor-master.iml" filepath="$PROJECT_DIR$/ark-android-monitor-master.iml" />
     </modules>
   </component>
 </project>

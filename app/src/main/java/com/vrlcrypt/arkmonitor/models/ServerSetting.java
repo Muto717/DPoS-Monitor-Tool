@@ -1,6 +1,7 @@
 package com.vrlcrypt.arkmonitor.models;
 
-public class Settings {
+public class ServerSetting {
+
     private String username;
     private String arkAddress;
     private String publicKey;

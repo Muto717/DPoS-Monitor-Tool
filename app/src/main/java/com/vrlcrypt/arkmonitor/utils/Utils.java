@@ -109,7 +109,7 @@ public class Utils {
         return prefsEditor.commit();
     }
 
-    public static Settings getSettings(Context context) {
+    public static ServerSe getSettings(Context context) {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         Settings settings = new Settings();

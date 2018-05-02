@@ -20,6 +20,7 @@ import com.vrlcrypt.arkmonitor.R;
 import com.vrlcrypt.arkmonitor.MainActivity;
 import com.vrlcrypt.arkmonitor.models.Delegate;
 import com.vrlcrypt.arkmonitor.models.Server;
+import com.vrlcrypt.arkmonitor.models.ServerSetting;
 import com.vrlcrypt.arkmonitor.models.Settings;
 import com.vrlcrypt.arkmonitor.scheduler.ForgingAlarmReceiver;
 import com.vrlcrypt.arkmonitor.services.ArkService;
@@ -75,7 +76,7 @@ public class SettingsFragment extends Fragment implements OnClickListener, Adapt
 
         final Spinner notificationIntervalSpinner = (Spinner) view.findViewById(R.id.notification_interval);
 
-        final Settings settings = Utils.getSettings(getActivity());
+        final ServerSetting settings = Utils.getSettings(getActivity());
 
         if (Utils.validateUsername(settings.getUsername())) {
             editTextUsername.setText(settings.getUsername());

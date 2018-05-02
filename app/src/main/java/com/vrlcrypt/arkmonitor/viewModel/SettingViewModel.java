@@ -5,19 +5,18 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.support.annotation.NonNull;
 import android.widget.ArrayAdapter;
 
-import com.vrlcrypt.arkmonitor.adapters.callback.SettingServerDelegate;
 import com.vrlcrypt.arkmonitor.models.Server;
-import com.vrlcrypt.arkmonitor.models.Settings;
+import com.vrlcrypt.arkmonitor.models.ServerSetting;
 
 public class SettingViewModel extends AndroidViewModel {
 
-    private Settings settings;
+    private ServerSetting settings;
 
     private ArrayAdapter<String> serverList;
 
     private SettingServerDelegate settingServerDelegate;
 
-    public SettingViewModel(@NonNull Application application, Settings settings, SettingServerDelegate settingServerDelegate) {
+    public SettingViewModel(@NonNull Application application, ServerSetting settings, SettingServerDelegate settingServerDelegate) {
         super(application);
 
         this.settings = settings;
