@@ -39,7 +39,7 @@ public class ServerSettingViewHolder extends RecyclerView.ViewHolder implements 
 
         switch (v.getId()) {
             case R.id.save_btn: {
-                viewModel.updateServerSettings(getEnteredValue(R.id.username), "", "", getEnteredValue(R.id.ip_address, "0.0.0.0"), getStringAsInt(getEnteredValue(R.id.port)),
+                viewModel.updateServerSettings(getEnteredValue(R.id.username), getEnteredValue(R.id.fld_address), getEnteredValue(R.id.fld_public_key), getEnteredValue(R.id.ip_address, "0.0.0.0"), getStringAsInt(getEnteredValue(R.id.port)),
                         ((CheckBox) mBinding.getRoot().findViewById(R.id.ssl_enabled)).isChecked(), Server.fromId(((Spinner) mBinding.getRoot().findViewById(R.id.servers)).getSelectedItemPosition()),
                         getInterval(((Spinner) mBinding.getRoot().findViewById(R.id.notification_interval)).getSelectedItemPosition()));
                 break;

@@ -13,8 +13,6 @@ import com.vrlcrypt.arkmonitor.MainActivity;
 import com.vrlcrypt.arkmonitor.R;
 import com.vrlcrypt.arkmonitor.adapters.BlocksAdapter;
 import com.vrlcrypt.arkmonitor.models.Block;
-import com.vrlcrypt.arkmonitor.models.Settings;
-import com.vrlcrypt.arkmonitor.services.ArkService;
 import com.vrlcrypt.arkmonitor.services.RequestListener;
 import com.vrlcrypt.arkmonitor.utils.Utils;
 
@@ -130,11 +128,11 @@ public class BlocksFragment extends Fragment implements RequestListener<List<Blo
     }
 
     private void refreshContent() {
-        Settings settings = Utils.getSettings(getActivity());
+        //ServerSetting settings = Utils.getSettings(getActivity());
 
-        mBlocks.clear();
+        //mBlocks.clear();
 
-        ArkService.getInstance().requestBlocks(settings, this);
+        //ArkService.getInstance().requestBlocks(settings, this);
     }
 
 }

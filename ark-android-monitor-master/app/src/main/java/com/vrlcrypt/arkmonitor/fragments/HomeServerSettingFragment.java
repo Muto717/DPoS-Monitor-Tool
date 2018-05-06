@@ -3,6 +3,7 @@ package com.vrlcrypt.arkmonitor.fragments;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +19,14 @@ import com.vrlcrypt.arkmonitor.models.PeerVersion;
 import com.vrlcrypt.arkmonitor.models.ServerSetting;
 import com.vrlcrypt.arkmonitor.models.Status;
 import com.vrlcrypt.arkmonitor.models.Ticker;
-import com.vrlcrypt.arkmonitor.services.ArkService;
 import com.vrlcrypt.arkmonitor.services.ExchangeService;
+import com.vrlcrypt.arkmonitor.services.ArkService;
 import com.vrlcrypt.arkmonitor.services.RequestListener;
 import com.vrlcrypt.arkmonitor.utils.Utils;
 
-public class MainFragmentV2 extends Fragment {
+public class HomeServerSettingFragment extends Fragment {
+
+    public static final String ARG_SERVER_SETTING = "SERVER_SETTING";
 
     private TextView usernameTextview;
     private TextView addressTextview;
@@ -48,8 +51,16 @@ public class MainFragmentV2 extends Fragment {
     private double bitcoinUSDValue = -1;
     private double bitcoinEURValue = -1;
 
-    public MainFragmentV2() {
-        // Required empty public constructor
+    private ServerSetting mServerSetting;
+
+    public static HomeServerSettingFragment newInstance (ServerSetting serverSetting) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(ARG_SERVER_SETTING, serverSetting);
+
+        HomeServerSettingFragment homeServerSettingFragment = new HomeServerSettingFragment();
+        homeServerSettingFragment.setArguments(bundle);
+
+        return homeServerSettingFragment;
     }
 
     @Override
@@ -85,12 +96,15 @@ public class MainFragmentV2 extends Fragment {
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
                 R.color.colorPrimaryDark,
                 R.color.colorAccent);
+
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 loadRequests();
             }
         });
+
+        mServerSetting = (ServerSetting) getArguments().getSerializable(ARG_SERVER_SETTING);
     }
 
     @Override
@@ -123,11 +137,11 @@ public class MainFragmentV2 extends Fragment {
     }
 
     private void loadLastForgedBlock() {
-        ServerSetting serverSetting = Utils.getSettings(getActivity());
-
-        ArkService.getInstance().requestLastBlockForged(serverSetting, new RequestListener<Block>() {
+        ArkService.getInstance().requestLastBlockForged(mServerSetting, new RequestListener<Block>() {
             @Override
             public void onFailure(Exception e) {
+                Log.e("ERR", "Error loading last forged block", e);
+
                 if (!isAdded()) {
                     return;
                 }
@@ -167,15 +181,15 @@ public class MainFragmentV2 extends Fragment {
     }
 
     private void loadDelegate() {
-        ServerSetting serverSetting = Utils.getSettings(getActivity());
-
-        if (Utils.validateUsername(serverSetting.getUsername())) {
-            usernameTextview.setText(serverSetting.getUsername());
+        if (Utils.validateUsername(mServerSetting.getUsername())) {
+            usernameTextview.setText(mServerSetting.getUsername());
         }
 
-        ArkService.getInstance().requestDelegate(serverSetting, new RequestListener<Delegate>() {
+        ArkService.getInstance().requestDelegate(mServerSetting, new RequestListener<Delegate>() {
             @Override
             public void onFailure(Exception e) {
+                Log.e("ERR", "Error loading delegate", e);
+
                 if (!isAdded()) {
                     return;
                 }
@@ -231,11 +245,11 @@ public class MainFragmentV2 extends Fragment {
     }
 
     private void loadPeerVersion() {
-        ServerSetting serverSetting = Utils.getSettings(getActivity());
-
-        ArkService.getInstance().requestPeerVersion(serverSetting, new RequestListener<PeerVersion>() {
+        ArkService.getInstance().requestPeerVersion(mServerSetting, new RequestListener<PeerVersion>() {
             @Override
             public void onFailure(Exception e) {
+                Log.e("ERR", "Error loading peer version", e);
+
                 if (!isAdded()) {
                     return;
                 }
@@ -271,9 +285,7 @@ public class MainFragmentV2 extends Fragment {
     }
 
     private void loadStatus() {
-        ServerSetting serverSetting = Utils.getSettings(getActivity());
-
-        ArkService.getInstance().requestStatus(serverSetting, new RequestListener<Status>() {
+        ArkService.getInstance().requestStatus(mServerSetting, new RequestListener<Status>() {
             @Override
             public void onFailure(Exception e) {
                 if (!isAdded()) {
@@ -312,9 +324,7 @@ public class MainFragmentV2 extends Fragment {
     }
 
     private void loadForging() {
-        ServerSetting serverSetting = Utils.getSettings(getActivity());
-
-        ArkService.getInstance().requestForging(serverSetting, new RequestListener<Forging>() {
+        ArkService.getInstance().requestForging(mServerSetting, new RequestListener<Forging>() {
             @Override
             public void onFailure(Exception e) {
                 if (!isAdded()) {
@@ -344,13 +354,21 @@ public class MainFragmentV2 extends Fragment {
                         hideLoadingIndicatorView();
                         mSwipeRefreshLayout.setRefreshing(false);
 
-                        String fees = Utils.formatDecimal(forging.getFees());
-                        String rewards = String.valueOf(Utils.convertToArkBase(forging.getRewards()));
-                        String forged = Utils.formatDecimal(forging.getForged());
+                        String fees = "";
+                        String rewards = "";
+                        String forged = "";
 
-                        feesTextview.setText(fees);
-                        rewardsTextview.setText(rewards);
-                        forgedTextview.setText(forged);
+                        if (forging != null) {
+                            if (forging.getFees() != null) fees = Utils.formatDecimal(forging.getFees());
+                            if (forging.getRewards() != null) rewards = String.valueOf(Utils.convertToArkBase(forging.getRewards()));
+                            if (forging.getForged() != null) forged = Utils.formatDecimal(forging.getForged());
+
+                            feesTextview.setText(fees);
+                            rewardsTextview.setText(rewards);
+                            forgedTextview.setText(forged);
+                        } else {
+                            Log.e("ERR", "FORGING OBJECT NULL");
+                        }
                     }
                 });
             }
@@ -358,16 +376,14 @@ public class MainFragmentV2 extends Fragment {
     }
 
     private void loadAccount() {
-        final ServerSetting serverSetting = Utils.getSettings(getActivity());
-
-        ArkService.getInstance().requestAccount(serverSetting, new RequestListener<Account>() {
+        ArkService.getInstance().requestAccount(mServerSetting, new RequestListener<Account>() {
             @Override
             public void onFailure(Exception e) {
                 if (!isAdded()) {
                     return;
                 }
 
-                MainFragmentV2.this.balance = -1;
+                HomeServerSettingFragment.this.balance = -1;
 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -386,7 +402,7 @@ public class MainFragmentV2 extends Fragment {
                     return;
                 }
 
-                MainFragmentV2.this.balance = account.getBalance();
+                HomeServerSettingFragment.this.balance = account.getBalance();
 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -395,7 +411,7 @@ public class MainFragmentV2 extends Fragment {
                         mSwipeRefreshLayout.setRefreshing(false);
 
                         addressTextview.setText(account.getAddress());
-                        balanceTextview.setText(Utils.formatDecimal(MainFragmentV2.this.balance));
+                        balanceTextview.setText(Utils.formatDecimal(HomeServerSettingFragment.this.balance));
 
                         calculateEquivalentInBitcoinUSDandEUR();
                     }
@@ -412,7 +428,7 @@ public class MainFragmentV2 extends Fragment {
                     return;
                 }
 
-                MainFragmentV2.this.arkBTCValue = -1;
+                HomeServerSettingFragment.this.arkBTCValue = -1;
 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -432,7 +448,7 @@ public class MainFragmentV2 extends Fragment {
                     return;
                 }
 
-                MainFragmentV2.this.arkBTCValue = ticker.getLast();
+                HomeServerSettingFragment.this.arkBTCValue = ticker.getLast();
 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -454,7 +470,7 @@ public class MainFragmentV2 extends Fragment {
                     return;
                 }
 
-                MainFragmentV2.this.bitcoinUSDValue = -1;
+                HomeServerSettingFragment.this.bitcoinUSDValue = -1;
 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -474,7 +490,7 @@ public class MainFragmentV2 extends Fragment {
                     return;
                 }
 
-                MainFragmentV2.this.bitcoinUSDValue = ticker.getLast();
+                HomeServerSettingFragment.this.bitcoinUSDValue = ticker.getLast();
 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -496,7 +512,7 @@ public class MainFragmentV2 extends Fragment {
                     return;
                 }
 
-                MainFragmentV2.this.bitcoinEURValue = -1;
+                HomeServerSettingFragment.this.bitcoinEURValue = -1;
 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -516,7 +532,7 @@ public class MainFragmentV2 extends Fragment {
                     return;
                 }
 
-                MainFragmentV2.this.bitcoinEURValue = ticker.getLast();
+                HomeServerSettingFragment.this.bitcoinEURValue = ticker.getLast();
 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -545,21 +561,21 @@ public class MainFragmentV2 extends Fragment {
         }
     }
 
-    private void calculateEquivalentInBitcoinUSDandEUR(){
-        if (MainFragmentV2.this != null && MainFragmentV2.this.balance > 0 && MainFragmentV2.this.arkBTCValue > 0) {
-            double balanceBtcEquivalent = MainFragmentV2.this.balance * MainFragmentV2.this.arkBTCValue;
+    private void calculateEquivalentInBitcoinUSDandEUR() {
+        if (HomeServerSettingFragment.this != null && HomeServerSettingFragment.this.balance > 0 && HomeServerSettingFragment.this.arkBTCValue > 0) {
+            double balanceBtcEquivalent = HomeServerSettingFragment.this.balance * HomeServerSettingFragment.this.arkBTCValue;
             balanceBtcEquivalentTextview.setText(Utils.formatDecimal(balanceBtcEquivalent));
 
-            if (MainFragmentV2.this.bitcoinUSDValue > 0) {
-                double balanceUSDEquivalent = balanceBtcEquivalent * MainFragmentV2.this.bitcoinUSDValue;
+            if (HomeServerSettingFragment.this.bitcoinUSDValue > 0) {
+                double balanceUSDEquivalent = balanceBtcEquivalent * HomeServerSettingFragment.this.bitcoinUSDValue;
                 balanceUsdEquivalentTextview.setText(Utils.formatDecimal(balanceUSDEquivalent));
             }
 
-            if (MainFragmentV2.this.bitcoinEURValue > 0) {
-                double balanceUSDEquivalent = balanceBtcEquivalent * MainFragmentV2.this.bitcoinEURValue;
+            if (HomeServerSettingFragment.this.bitcoinEURValue > 0) {
+                double balanceUSDEquivalent = balanceBtcEquivalent * HomeServerSettingFragment.this.bitcoinEURValue;
                 balanceEurEquivalentTextview.setText(Utils.formatDecimal(balanceUSDEquivalent));
             }
         }
-
     }
+
 }

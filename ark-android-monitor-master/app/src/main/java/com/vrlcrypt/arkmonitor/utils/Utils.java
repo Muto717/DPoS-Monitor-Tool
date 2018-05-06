@@ -129,9 +129,13 @@ public class Utils {
     }
 
     public static String formatDecimal(double value) {
-        double total = convertToArkBase(value);
-        DecimalFormat df = new DecimalFormat("#0.00000000");
-        return df.format(total);
+        try {
+            double total = convertToArkBase(value);
+            DecimalFormat df = new DecimalFormat("#0.00000000");
+            return df.format(total);
+        } catch (NumberFormatException ex) {
+            return "";
+        }
     }
 
     public static double convertToArkBase(double value){

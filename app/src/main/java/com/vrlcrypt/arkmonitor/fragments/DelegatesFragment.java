@@ -13,7 +13,7 @@ import com.vrlcrypt.arkmonitor.R;
 import com.vrlcrypt.arkmonitor.MainActivity;
 import com.vrlcrypt.arkmonitor.adapters.DelegatesAdapter;
 import com.vrlcrypt.arkmonitor.models.Delegate;
-import com.vrlcrypt.arkmonitor.models.Settings;
+import com.vrlcrypt.arkmonitor.models.ServerSetting;
 import com.vrlcrypt.arkmonitor.services.ArkService;
 import com.vrlcrypt.arkmonitor.services.RequestListener;
 import com.vrlcrypt.arkmonitor.utils.Utils;
@@ -135,12 +135,12 @@ public class DelegatesFragment extends Fragment implements RequestListener<List<
     }
 
     private void refreshContent() {
-        Settings settings = Utils.getSettings(getActivity());
+        //Settings settings = Utils.getSettings(getActivity());
 
-        mDelegates.clear();
+        //mDelegates.clear();
 
-        ArkService.getInstance().requestActiveDelegates(settings, this);
-        ArkService.getInstance().requestStandyByDelegates(settings, this);
+        //ArkService.getInstance().requestActiveDelegates(settings, this);
+        //ArkService.getInstance().requestStandyByDelegates(settings, this);
     }
 
 }

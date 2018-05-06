@@ -1,5 +1,7 @@
 package com.vrlcrypt.arkmonitor.services;
 
+import android.util.Log;
+
 import com.vrlcrypt.arkmonitor.models.Account;
 import com.vrlcrypt.arkmonitor.models.Block;
 import com.vrlcrypt.arkmonitor.models.Delegate;
@@ -540,6 +542,8 @@ public class ArkService {
             @Override
             public void onResponse(Call call, final Response response) throws IOException {
                 String jsonData = response.body().string();
+                Log.d("LAST FORGED BLOCK", "Data: " + jsonData);
+
                 try {
                     JSONObject jsonObject = new JSONObject(jsonData);
 

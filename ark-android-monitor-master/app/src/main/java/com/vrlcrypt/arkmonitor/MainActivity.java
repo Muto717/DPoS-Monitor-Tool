@@ -17,7 +17,7 @@ import android.view.View;
 import com.vrlcrypt.arkmonitor.fragments.BlocksFragment;
 import com.vrlcrypt.arkmonitor.fragments.DelegatesFragment;
 import com.vrlcrypt.arkmonitor.fragments.LatestTransactionsFragment;
-import com.vrlcrypt.arkmonitor.fragments.MainFragment;
+import com.vrlcrypt.arkmonitor.fragments.HomeFragment;
 import com.vrlcrypt.arkmonitor.fragments.PeersFragment;
 import com.vrlcrypt.arkmonitor.fragments.SettingsFragment;
 import com.vrlcrypt.arkmonitor.fragments.SettingsV2Fragment;
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = null;
 
         if (id == R.id.nav_home) {
-            fragment = new MainFragment();
+            fragment = new HomeFragment();
             setTitle(R.string.nav_home);
         } else if (id == R.id.nav_forged_blocks) {
             fragment = new BlocksFragment();
@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void showFragment(Fragment fragment) {
+    public void showFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager()
                 .beginTransaction();
 
