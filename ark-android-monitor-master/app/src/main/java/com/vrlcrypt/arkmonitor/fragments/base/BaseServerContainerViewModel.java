@@ -1,4 +1,4 @@
-package com.vrlcrypt.arkmonitor.fragments.viewModel;
+package com.vrlcrypt.arkmonitor.fragments.base;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -12,20 +12,19 @@ import com.vrlcrypt.arkmonitor.persistance.SettingsDatabase;
 import java.util.List;
 
 import io.reactivex.Flowable;
-import io.reactivex.functions.Consumer;
 
-public class MainFragmentViewModel extends AndroidViewModel {
+public class BaseServerContainerViewModel extends AndroidViewModel {
 
     public ObservableBoolean hasServerSetup;
 
     public Flowable<List<ServerSetting>> serverSettingObserver = SettingsDatabase.getInstance(getApplication()).settingDao().getSettings();
 
-    public MainFragmentViewModel(@NonNull Application application) {
+    public BaseServerContainerViewModel(@NonNull Application application) {
         super(application);
 
         hasServerSetup = new ObservableBoolean();
 
-        SubscriptionManager.getInstance().putSubscription(MainFragmentViewModel.class.getSimpleName(),
+        SubscriptionManager.getInstance().putSubscription(BaseServerContainerViewModel.class.getSimpleName(),
                 serverSettingObserver.subscribe(serverSettings -> {
                     if (serverSettings.isEmpty())
                         hasServerSetup.set(false);
@@ -39,7 +38,7 @@ public class MainFragmentViewModel extends AndroidViewModel {
     protected void onCleared() {
         super.onCleared();
 
-        SubscriptionManager.getInstance().dispose(MainFragmentViewModel.class.getSimpleName());
+        SubscriptionManager.getInstance().dispose(BaseServerContainerViewModel.class.getSimpleName());
     }
 
 }

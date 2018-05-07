@@ -1,4 +1,4 @@
-package com.vrlcrypt.arkmonitor.fragments;
+package com.vrlcrypt.arkmonitor.fragments.delegates;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,46 +9,56 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.vrlcrypt.arkmonitor.MainActivity;
 import com.vrlcrypt.arkmonitor.R;
-import com.vrlcrypt.arkmonitor.adapters.BlocksAdapter;
-import com.vrlcrypt.arkmonitor.models.Block;
+import com.vrlcrypt.arkmonitor.MainActivity;
+import com.vrlcrypt.arkmonitor.adapters.DelegatesAdapter;
+import com.vrlcrypt.arkmonitor.models.Delegate;
 import com.vrlcrypt.arkmonitor.models.ServerSetting;
 import com.vrlcrypt.arkmonitor.services.ArkService;
 import com.vrlcrypt.arkmonitor.services.RequestListener;
 import com.vrlcrypt.arkmonitor.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class BlocksFragment extends Fragment implements RequestListener<List<Block>>{
+import static com.vrlcrypt.arkmonitor.fragments.home.HomeServerSettingFragment.ARG_SERVER_SETTING;
+
+public class DelegatesFragment extends Fragment implements RequestListener<List<Delegate>>{
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private List<Block> mBlocks = new ArrayList<>();
-    private BlocksAdapter mBlocksAdapter;
+    private List<Delegate> mDelegates = new ArrayList<>();
+    private DelegatesAdapter mDelegatesAdapter;
 
-    public BlocksFragment() {
-        // Required empty public constructor
+    public static DelegatesFragment newInstance (ServerSetting serverSetting) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(ARG_SERVER_SETTING, serverSetting);
+
+        DelegatesFragment homeServerSettingFragment = new DelegatesFragment();
+        homeServerSettingFragment.setArguments(bundle);
+
+        return homeServerSettingFragment;
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_blocks, container, false);
+        return inflater.inflate(R.layout.fragment_delegates, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mBlocksAdapter = new BlocksAdapter(getContext(), mBlocks);
+        mDelegatesAdapter = new DelegatesAdapter(getContext(), mDelegates);
 
-        RecyclerView rvBlocks = (RecyclerView) view.findViewById(R.id.rvBlocks);
+        RecyclerView rvDelegates = (RecyclerView) view.findViewById(R.id.rvDelegates);
 
-        rvBlocks.setAdapter(mBlocksAdapter);
-        rvBlocks.setLayoutManager(new LinearLayoutManager(getActivity()));
+        rvDelegates.setAdapter(mDelegatesAdapter);
+        rvDelegates.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.blocks_refresh_layout);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.delegates_refresh_layout);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
                 R.color.colorPrimaryDark,
                 R.color.colorAccent);
@@ -60,7 +70,7 @@ public class BlocksFragment extends Fragment implements RequestListener<List<Blo
         });
 
         if (Utils.isOnline(getActivity())) {
-            loadBlocs();
+            loadDelegates();
         } else {
             Utils.showMessage(getResources().getString(R.string.internet_off), view);
         }
@@ -75,7 +85,7 @@ public class BlocksFragment extends Fragment implements RequestListener<List<Blo
         super.onDestroy();
     }
 
-    private void loadBlocs() {
+    private void loadDelegates() {
         MainActivity activity = (MainActivity) getActivity();
         if (activity != null) {
             activity.showLoadingIndicatorView();
@@ -106,35 +116,40 @@ public class BlocksFragment extends Fragment implements RequestListener<List<Blo
     }
 
     @Override
-    public void onResponse(final List<Block> blocks) {
+    public void onResponse(final List<Delegate> delegates) {
         if (!isAdded()) {
             return;
         }
 
-        mBlocks.addAll(blocks);
+        mDelegates.addAll(delegates);
 
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mBlocksAdapter.setBlocks(mBlocks);
-                mBlocksAdapter.notifyDataSetChanged();
 
-                MainActivity activity = (MainActivity) getActivity();
-                if (activity != null) {
-                    activity.hideLoadingIndicatorView();
+                if (mDelegates.size() > 51) {
+                    Collections.sort(mDelegates);
+                    mDelegatesAdapter.setDelegates(mDelegates);
+                    mDelegatesAdapter.notifyDataSetChanged();
+
+                    MainActivity activity = (MainActivity) getActivity();
+                    if (activity != null) {
+                        activity.hideLoadingIndicatorView();
+                    }
+
+                    mSwipeRefreshLayout.setRefreshing(false);
                 }
-
-                mSwipeRefreshLayout.setRefreshing(false);
             }
         });
     }
 
     private void refreshContent() {
-        ServerSetting serverSetting = Utils.getSettings(getActivity());
+        ServerSetting serverSetting = (ServerSetting) getArguments().getSerializable(ARG_SERVER_SETTING);
 
-        mBlocks.clear();
+        mDelegates.clear();
 
-        ArkService.getInstance().requestBlocks(serverSetting, this);
+        ArkService.getInstance().requestActiveDelegates(serverSetting, this);
+        ArkService.getInstance().requestStandyByDelegates(serverSetting, this);
     }
 
 }

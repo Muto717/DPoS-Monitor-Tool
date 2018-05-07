@@ -39,7 +39,7 @@ public class SettingViewModel extends AndroidViewModel {
     }
 
     public void updateServerSettings(String username, String arkAddress, String publicKey, String ipAddress, int port, boolean sslEnabled, Server server, long notificationInterval) {
-        this.serverSetting.setUsername(username);
+        this.serverSetting.setServerName(username);
         this.serverSetting.setArkAddress(arkAddress);
         this.serverSetting.setPublicKey(publicKey);
         this.serverSetting.setIpAddress(ipAddress);

@@ -4,7 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.vrlcrypt.arkmonitor.fragments.HomeServerSettingFragment;
+import com.vrlcrypt.arkmonitor.fragments.home.HomeServerSettingFragment;
+import com.vrlcrypt.arkmonitor.models.ServerSetting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
 
 public class MainViewPagerAdapter extends FragmentStatePagerAdapter {
 
-    private List<HomeServerSettingFragment> mDataSource;
+    private List<ServerSetting> mDataSource;
 
     public MainViewPagerAdapter (FragmentManager fragmentManager) {
         super(fragmentManager);
@@ -31,12 +32,20 @@ public class MainViewPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return mDataSource.get(position);
+        return HomeServerSettingFragment.newInstance(mDataSource.get(position));
     }
 
-    public void insert(HomeServerSettingFragment fragment) {
-        mDataSource.add(fragment);
+    public void insert(ServerSetting serverSetting) {
+        mDataSource.add(serverSetting);
         notifyDataSetChanged();
+    }
+
+    @Override
+    public CharSequence getPageTitle(int position) {
+        if (mDataSource.isEmpty())
+            return "";
+
+        return mDataSource.get(position).getServerName();
     }
 
 }

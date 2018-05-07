@@ -14,22 +14,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.vrlcrypt.arkmonitor.fragments.BlocksFragment;
-import com.vrlcrypt.arkmonitor.fragments.DelegatesFragment;
-import com.vrlcrypt.arkmonitor.fragments.LatestTransactionsFragment;
-import com.vrlcrypt.arkmonitor.fragments.HomeFragment;
-import com.vrlcrypt.arkmonitor.fragments.PeersFragment;
-import com.vrlcrypt.arkmonitor.fragments.SettingsFragment;
+import com.vrlcrypt.arkmonitor.fragments.block.BlocksContainerFragment;
+import com.vrlcrypt.arkmonitor.fragments.delegates.DelegateContainerFragment;
+import com.vrlcrypt.arkmonitor.fragments.home.HomeContainerFragment;
+import com.vrlcrypt.arkmonitor.fragments.peers.PeersContainerFragment;
 import com.vrlcrypt.arkmonitor.fragments.SettingsV2Fragment;
-import com.vrlcrypt.arkmonitor.fragments.VotersFragment;
-import com.vrlcrypt.arkmonitor.fragments.VotesFragment;
-import com.vrlcrypt.arkmonitor.models.ServerSetting;
+import com.vrlcrypt.arkmonitor.fragments.voters.VoterContainerFragment;
+import com.vrlcrypt.arkmonitor.fragments.voters.VotersFragment;
+import com.vrlcrypt.arkmonitor.fragments.votes.VotesContainerFragment;
+import com.vrlcrypt.arkmonitor.fragments.transactions.TransactionsContainerFragment;
 import com.vrlcrypt.arkmonitor.scheduler.ForgingAlarmReceiver;
 import com.vrlcrypt.arkmonitor.utils.Utils;
 import com.wang.avi.AVLoadingIndicatorView;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.OnSavedSettingsListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private final ForgingAlarmReceiver mAlarm = new ForgingAlarmReceiver();
     private AVLoadingIndicatorView mLoadingIndicatorView;
@@ -77,26 +76,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-
-        this.mMenu = menu;
-
-        MenuItem menuItem = menu.findItem(R.id.action_alarm);
-
-        if (Utils.alarmEnabled(this)) {
-            menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_alarm_on_white_24dp));
-        } else {
-            menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_alarm_off_white_24dp));
-        }
-
-        ServerSetting serverSetting = Utils.getSettings(this);
-
-        if (!Utils.validateUsername(serverSetting.getUsername()) ||
-                !(Utils.validateIpAddress(serverSetting.getIpAddress()) &&
-                        Utils.validatePort(serverSetting.getPort()) || !serverSetting.getServer().isCustomServer())) {
-            menuItem.setVisible(false);
-        }
-
         return true;
     }
 
@@ -140,28 +119,28 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = null;
 
         if (id == R.id.nav_home) {
-            fragment = new HomeFragment();
+            fragment = new HomeContainerFragment();
             setTitle(R.string.nav_home);
         } else if (id == R.id.nav_forged_blocks) {
-            fragment = new BlocksFragment();
+            fragment = new BlocksContainerFragment();
             setTitle(R.string.nav_forged_blocks);
         } else if (id == R.id.nav_latest_transactions) {
-            fragment = new LatestTransactionsFragment();
+            fragment = new TransactionsContainerFragment();
             setTitle(R.string.nav_latest_transactions);
         } else if (id == R.id.nav_peers) {
-            fragment = new PeersFragment();
+            fragment = new PeersContainerFragment();
             setTitle(R.string.nav_peers);
         } else if (id == R.id.nav_delegates) {
-            fragment = new DelegatesFragment();
+            fragment = new DelegateContainerFragment();
             setTitle(R.string.nav_delegates);
         } else if (id == R.id.nav_settings) {
             fragment = new SettingsV2Fragment();
             setTitle(R.string.nav_settings);
         } else if (id == R.id.nav_votes_made) {
-            fragment = new VotesFragment();
+            fragment = new VotesContainerFragment();
             setTitle(R.string.nav_votes_made);
         } else if (id == R.id.nav_votes_received) {
-            fragment = new VotersFragment();
+            fragment = new VoterContainerFragment();
             setTitle(R.string.nav_votes_received);
         }
 
@@ -183,17 +162,10 @@ public class MainActivity extends AppCompatActivity
         fragmentTransaction.commit();
     }
 
-    @Override
-    public void onSavedSettingsListener() {
-        final MenuItem menuItem = mMenu.findItem(R.id.action_alarm);
-
-        runOnUiThread(() -> {
-            mToggle.setDrawerIndicatorEnabled(true);
-            NavigationView navigationView = findViewById(R.id.nav_view);
-            onNavigationItemSelected(navigationView.getMenu().getItem(NavItem.HOME.getIndex()));
-
-            menuItem.setVisible(true);
-        });
+    public void selectMenuItem (int menuItem) {
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setCheckedItem(menuItem);
+        onNavigationItemSelected(navigationView.getMenu().findItem(menuItem));
     }
 
     enum NavItem {

@@ -250,10 +250,14 @@ public class ArkService {
         String urlRequest = replaceURLWithSettings(VOTES_URL, serverSetting);
         urlRequest = urlRequest + "?address=" + serverSetting.getArkAddress();
 
+        Log.d("RequestVote", "Address: " + urlRequest);
+
         Request request = new Request.Builder()
                 .url(urlRequest)
                 .build();
+
         client.newCall(request).enqueue(new Callback() {
+
             @Override
             public void onFailure(Call call, IOException e) {
                 listener.onFailure(e);
@@ -262,6 +266,8 @@ public class ArkService {
             @Override
             public void onResponse(Call call, final Response response) throws IOException {
                 String jsonData = response.body().string();
+                Log.d("RequestVote", "Json: " + jsonData);
+
                 try {
                     JSONObject jsonObject = new JSONObject(jsonData);
 
@@ -279,6 +285,7 @@ public class ArkService {
                 } catch (JSONException e) {
                     listener.onFailure(e);
                 }
+
             }
         });
     }
@@ -470,13 +477,13 @@ public class ArkService {
             }
         }
 
-        if (!Utils.validateUsername(serverSetting.getUsername())) {
+        if (!Utils.validateUsername(serverSetting.getServerName())) {
             listener.onFailure(new Exception("Invalid Username"));
             return;
         }
 
         String urlRequest = replaceURLWithSettings(DELEGATE_URL, serverSetting);
-        urlRequest = urlRequest + "?username=" + serverSetting.getUsername();
+        urlRequest = urlRequest + "?username=" + serverSetting.getServerName();
 
         Request request = new Request.Builder()
                 .url(urlRequest)

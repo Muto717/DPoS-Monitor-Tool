@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name">Ark Monitor</string>
+    <string name="app_name">DPOS Monitor Tool</string>
     <string name="action_alarm">Alarm</string>
     <string name="empty" />
     <string name="undefined">-</string>
@@ -29,7 +29,7 @@
     <string name="ip_address">IP address</string>
     <string name="ip_address_hint">0.0.0.0</string>
     <string name="ip_address_message">Please enter a valid ip address</string>
-    <string name="username_message">Please enter a valid username</string>
+    <string name="username_message">Please enter a valid serverName</string>
     <string name="port">Port</string>
     <string name="port_hint">4001</string>
     <string name="port_message">Please enter a valid port</string>
@@ -44,7 +44,7 @@
 
     <!-- Delegates-->
     <string name="rank">Rank</string>
-    <string name="username">Username</string>
+    <string name="serverName">Username</string>
     <string name="address">Address</string>
     <string name="productivity">Productivity</string>
     <string name="last_block_forged">Last block forged</string>

@@ -5,7 +5,7 @@
     android:layout_marginLeft="@dimen/default_horizontal_margin"
     android:layout_marginRight="@dimen/default_horizontal_margin"
     android:orientation="vertical"
-    tools:context="com.vrlcrypt.arkmonitor.fragments.LatestTransactionsFragment">
+    tools:context="com.vrlcrypt.arkmonitor.fragments.transactions.LatestTransactionsFragment">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/latest_transactions_refresh_layout"

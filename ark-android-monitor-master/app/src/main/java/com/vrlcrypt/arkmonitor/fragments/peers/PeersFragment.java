@@ -1,4 +1,4 @@
-package com.vrlcrypt.arkmonitor.fragments;
+package com.vrlcrypt.arkmonitor.fragments.peers;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,33 +11,43 @@ import android.view.ViewGroup;
 
 import com.vrlcrypt.arkmonitor.R;
 import com.vrlcrypt.arkmonitor.MainActivity;
-import com.vrlcrypt.arkmonitor.adapters.VotesAdapter;
+import com.vrlcrypt.arkmonitor.adapters.PeersAdapter;
+import com.vrlcrypt.arkmonitor.models.Peer;
 import com.vrlcrypt.arkmonitor.models.ServerSetting;
-import com.vrlcrypt.arkmonitor.models.Votes;
 import com.vrlcrypt.arkmonitor.services.ArkService;
 import com.vrlcrypt.arkmonitor.services.RequestListener;
 import com.vrlcrypt.arkmonitor.utils.Utils;
 
-public class VotesFragment extends Fragment implements RequestListener<Votes> {
+import java.util.List;
+
+import static com.vrlcrypt.arkmonitor.fragments.home.HomeServerSettingFragment.ARG_SERVER_SETTING;
+
+public class PeersFragment extends Fragment implements RequestListener<List<Peer>> {
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    public VotesFragment() {
-        // Required empty public constructor
+    public static PeersFragment newInstance (ServerSetting serverSetting) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(ARG_SERVER_SETTING, serverSetting);
+
+        PeersFragment homeServerSettingFragment = new PeersFragment();
+        homeServerSettingFragment.setArguments(bundle);
+
+        return homeServerSettingFragment;
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        return inflater.inflate(R.layout.fragment_votes, container, false);
+        return inflater.inflate(R.layout.fragment_peers, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.votes_refresh_layout);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.peers_refresh_layout);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
                 R.color.colorPrimaryDark,
                 R.color.colorAccent);
@@ -49,10 +59,11 @@ public class VotesFragment extends Fragment implements RequestListener<Votes> {
         });
 
         if (Utils.isOnline(getActivity())) {
-            loadVotes();
+            loadPeers();
         } else {
             Utils.showMessage(getResources().getString(R.string.internet_off), view);
         }
+
     }
 
     @Override
@@ -64,15 +75,15 @@ public class VotesFragment extends Fragment implements RequestListener<Votes> {
         super.onDestroy();
     }
 
-    private void loadVotes() {
+    private void loadPeers() {
         MainActivity activity = (MainActivity) getActivity();
         if (activity != null) {
             activity.showLoadingIndicatorView();
         }
 
-        ServerSetting serverSetting = Utils.getSettings(getActivity());
+        ServerSetting serverSetting = (ServerSetting) getArguments().getSerializable(ARG_SERVER_SETTING);
 
-        ArkService.getInstance().requestVotes(serverSetting, this);
+        ArkService.getInstance().requestPeers(serverSetting, this);
     }
 
     @Override
@@ -97,7 +108,7 @@ public class VotesFragment extends Fragment implements RequestListener<Votes> {
     }
 
     @Override
-    public void onResponse(final Votes votes) {
+    public void onResponse(final List<Peer> peers) {
         if (!isAdded()) {
             return;
         }
@@ -105,14 +116,13 @@ public class VotesFragment extends Fragment implements RequestListener<Votes> {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 View view = getView();
 
-                RecyclerView rvVotes = (RecyclerView) view.findViewById(R.id.rvVotes);
+                RecyclerView rvPeers = (RecyclerView) view.findViewById(R.id.rvPeers);
 
-                VotesAdapter adapter = new VotesAdapter(votes);
-                rvVotes.setAdapter(adapter);
-                rvVotes.setLayoutManager(new LinearLayoutManager(getActivity()));
+                PeersAdapter adapter = new PeersAdapter(getContext(), peers);
+                rvPeers.setAdapter(adapter);
+                rvPeers.setLayoutManager(new LinearLayoutManager(getActivity()));
 
                 MainActivity activity = (MainActivity) getActivity();
                 if (activity != null) {
@@ -125,8 +135,7 @@ public class VotesFragment extends Fragment implements RequestListener<Votes> {
     }
 
     private void refreshContent() {
-        ServerSetting serverSetting = Utils.getSettings(getActivity());
-        ArkService.getInstance().requestVotes(serverSetting, this);
+        ServerSetting serverSetting = (ServerSetting) getArguments().getSerializable(ARG_SERVER_SETTING);
+        ArkService.getInstance().requestPeers(serverSetting, this);
     }
-
 }

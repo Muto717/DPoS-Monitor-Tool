@@ -5,15 +5,15 @@
 
         <variable
             name="model"
-            type="com.vrlcrypt.arkmonitor.adapters.viewModel.SettingViewModel"/>
+            type="com.vrlcrypt.arkmonitor.adapters.viewModel.SettingViewModel" />
 
         <variable
             name="onClick"
-            type="android.view.View.OnClickListener"/>
+            type="android.view.View.OnClickListener" />
 
         <variable
             name="onItemSelected"
-            type="android.widget.AdapterView.OnItemSelectedListener"/>
+            type="android.widget.AdapterView.OnItemSelectedListener" />
 
     </data>
 
@@ -24,8 +24,8 @@
         android:layout_marginLeft="@dimen/default_horizontal_margin"
         android:layout_marginRight="@dimen/default_horizontal_margin"
         android:layout_marginTop="@dimen/default_vertical_margin"
-        android:elevation="2dp"
         android:background="@android:color/white"
+        android:elevation="2dp"
         android:orientation="vertical">
 
         <TableLayout
@@ -55,19 +55,19 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
                     android:maxLines="1"
-                    android:text="@string/username"
+                    android:text="@string/serverName"
                     android:textAlignment="textStart"
                     android:textSize="@dimen/default_font_size"
                     android:textStyle="bold" />
 
                 <EditText
-                    android:id="@+id/username"
+                    android:id="@+id/serverName"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:hint="@string/empty"
-                    android:text="@{model.serverSetting.username}"
                     android:imeOptions="flagNoExtractUi"
+                    android:text="@{model.serverSetting.serverName}"
                     android:textAlignment="textEnd"
                     android:textSize="@dimen/default_font_size" />
             </TableRow>
@@ -96,8 +96,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:hint="@string/empty"
-                    android:text="026b87a3ad1c13adfc4256f5365f5e6251693a27b2293676db14690efce5acae6e"
                     android:imeOptions="flagNoExtractUi"
+                    android:text="026b87a3ad1c13adfc4256f5365f5e6251693a27b2293676db14690efce5acae6e"
                     android:textAlignment="textEnd"
                     android:textSize="@dimen/default_font_size" />
 
@@ -127,8 +127,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:hint="@string/empty"
-                    android:text="AZzmCRP3Us7q4Pbyu3qCr2Dwq8vvuseLKa"
                     android:imeOptions="flagNoExtractUi"
+                    android:text="AZzmCRP3Us7q4Pbyu3qCr2Dwq8vvuseLKa"
                     android:textAlignment="textEnd"
                     android:textSize="@dimen/default_font_size" />
 
@@ -167,9 +167,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:spinnerEntries="@{model.serverList}"
+                    android:textAlignment="textEnd"
                     app:onItemSelected="@{onItemSelected}"
-                    android:textAlignment="textEnd" />
+                    app:spinnerEntries="@{model.serverList}" />
 
             </TableRow>
 
@@ -209,10 +209,10 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:hint="@string/ip_address_hint"
-                    android:text="@{model.serverSetting.ipAddress}"
                     android:enabled="@{model.isCustomServer ? true : false}"
+                    android:hint="@string/ip_address_hint"
                     android:imeOptions="flagNoExtractUi"
+                    android:text="@{model.serverSetting.ipAddress}"
                     android:textAlignment="textEnd"
                     android:textSize="@dimen/default_font_size" />
             </TableRow>
@@ -252,10 +252,10 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
+                    android:enabled="@{model.isCustomServer ? true : false}"
                     android:hint="@string/port_hint"
                     android:inputType="number"
                     android:maxLength="20"
-                    android:enabled="@{model.isCustomServer ? true : false}"
                     android:maxLines="1"
                     android:text="@{model.serverSetting.portAsString}"
                     android:textAlignment="textEnd"
@@ -296,9 +296,9 @@
                     android:id="@+id/ssl_enabled"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:checked="@{model.isCustomServer ? model.serverSetting.sslEnabled : false}"
                     android:enabled="@{model.isCustomServer ? true : false}"
-                    android:layout_weight="1"
                     android:textAlignment="textEnd" />
             </TableRow>
 
@@ -337,8 +337,8 @@
                     android:layout_weight="2"
                     android:entries="@array/notification_interval_types"
                     android:textAlignment="textEnd"
-                    app:onItemSelected="@{onItemSelected}"
-                    android:textSize="@dimen/default_font_size" />
+                    android:textSize="@dimen/default_font_size"
+                    app:onItemSelected="@{onItemSelected}" />
             </TableRow>
 
         </TableLayout>
@@ -346,29 +346,30 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:gravity="right"
+            android:layout_gravity="left"
+            android:gravity="left"
             android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btn_delete"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:layout_width="wrap_content"
-                android:onClick="@{onClick}"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:text="Delete" />
 
             <Button
                 android:id="@+id/save_btn"
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="wrap_content"
-                android:onClick="@{onClick}"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
+                android:onClick="@{onClick}"
                 android:text="@string/save_action" />
+
+            <Button
+                android:id="@+id/btn_delete"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:onClick="@{onClick}"
+                android:text="Delete" />
 
         </LinearLayout>
 
     </LinearLayout>
+
 </layout>

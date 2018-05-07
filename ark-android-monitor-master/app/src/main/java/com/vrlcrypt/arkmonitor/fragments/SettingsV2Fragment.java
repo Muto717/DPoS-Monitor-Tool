@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 
 public class SettingsV2Fragment extends Fragment implements OnClickListener {
@@ -53,9 +54,12 @@ public class SettingsV2Fragment extends Fragment implements OnClickListener {
                                 boolean found = false;
 
                                 for (SettingViewModel viewModel : mSettingAdapter.getDataSource())
-                                    if (viewModel.getServerSetting().getUsername().equals(serverSetting.getUsername())) found = true;
+                                    if (viewModel.getServerSetting().getServerName() != null)
+                                        if (viewModel.getServerSetting().getServerName().equals(serverSetting.getServerName()))
+                                            found = true;
 
-                                if (!found) toAdd.add(new SettingViewModel(getActivity().getApplication(), serverSetting));
+                                if (!found)
+                                    toAdd.add(new SettingViewModel(getActivity().getApplication(), serverSetting));
                             }
 
                             return toAdd;
@@ -64,8 +68,12 @@ public class SettingsV2Fragment extends Fragment implements OnClickListener {
                             for (SettingViewModel viewModel : settings)
                                 mSettingAdapter.insertNew(viewModel);
 
-                            if (mSettingAdapter.getDataSource().isEmpty()) mBinding.txtNoServers.setVisibility(View.VISIBLE);
-                            else mBinding.txtNoServers.setVisibility(View.GONE);
+                            if (mSettingAdapter.getDataSource().isEmpty())
+                                mBinding.txtNoServers.setVisibility(View.VISIBLE);
+                            else {
+                                mBinding.txtNoServers.setVisibility(View.GONE);
+                                mBinding.listSetting.scrollToPosition(0);
+                            }
                         }),
                 true);
     }
@@ -82,8 +90,10 @@ public class SettingsV2Fragment extends Fragment implements OnClickListener {
 
         switch (v.getId()) {
             case R.id.btn_add_new_server: {
-                SettingsDatabase.getInstance(getContext()).insert(new ServerSetting()).subscribe();
-                mBinding.listSetting.scrollToPosition(0);
+
+                SettingsDatabase.getInstance(getContext()).insert(new ServerSetting())
+                        .doOnComplete(() -> mBinding.listSetting.scrollToPosition(0))
+                        .subscribe();
                 break;
             }
         }

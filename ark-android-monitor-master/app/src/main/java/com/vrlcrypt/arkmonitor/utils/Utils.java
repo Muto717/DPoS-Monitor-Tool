@@ -96,7 +96,7 @@ public class Utils {
 
         SharedPreferences.Editor prefsEditor = mPrefs.edit();
 
-        prefsEditor.putString(ServerSetting.USERNAME_ATTR, serverSetting.getUsername());
+        prefsEditor.putString(ServerSetting.USERNAME_ATTR, serverSetting.getServerName());
         prefsEditor.putString(ServerSetting.ARK_ADDRESS_ATTR, serverSetting.getArkAddress());
         prefsEditor.putString(ServerSetting.PUBLIC_KEY_ATTR, serverSetting.getPublicKey());
         prefsEditor.putString(ServerSetting.IP_ATTR, serverSetting.getIpAddress());
@@ -112,7 +112,7 @@ public class Utils {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         ServerSetting serverSetting = new ServerSetting();
-        serverSetting.setUsername(mPrefs.getString(ServerSetting.USERNAME_ATTR, null));
+        serverSetting.setServerName(mPrefs.getString(ServerSetting.USERNAME_ATTR, null));
         serverSetting.setArkAddress(mPrefs.getString(ServerSetting.ARK_ADDRESS_ATTR, null));
         serverSetting.setPublicKey(mPrefs.getString(ServerSetting.PUBLIC_KEY_ATTR, null));
         serverSetting.setIpAddress(mPrefs.getString(ServerSetting.IP_ATTR, null));

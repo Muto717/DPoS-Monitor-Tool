@@ -1,4 +1,4 @@
-package com.vrlcrypt.arkmonitor.fragments;
+package com.vrlcrypt.arkmonitor.fragments.home;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -146,14 +146,10 @@ public class HomeServerSettingFragment extends Fragment {
                     return;
                 }
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideLoadingIndicatorView();
-                        mSwipeRefreshLayout.setRefreshing(false);
-
-                        Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
-                    }
+                getActivity().runOnUiThread(() -> {
+                    hideLoadingIndicatorView();
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
                 });
             }
 
@@ -163,26 +159,22 @@ public class HomeServerSettingFragment extends Fragment {
                     return;
                 }
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideLoadingIndicatorView();
-                        mSwipeRefreshLayout.setRefreshing(false);
 
-                        if (block != null && block.getTimestamp() > 0) {
-                            lastBlockForgedTextView.setText(Utils.getTimeAgo(block.getTimestamp()));
-                        } else {
-                            lastBlockForgedTextView.setText(R.string.not_forging);
-                        }
-                    }
+                final CharSequence timeAgo = (block != null && block.getTimestamp() > 0) ? Utils.getTimeAgo(block.getTimestamp()) : getString(R.string.not_forging);
+
+                getActivity().runOnUiThread(() -> {
+                    hideLoadingIndicatorView();
+
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    lastBlockForgedTextView.setText(timeAgo);
                 });
             }
         });
     }
 
     private void loadDelegate() {
-        if (Utils.validateUsername(mServerSetting.getUsername())) {
-            usernameTextview.setText(mServerSetting.getUsername());
+        if (Utils.validateUsername(mServerSetting.getServerName())) {
+            usernameTextview.setText(mServerSetting.getServerName());
         }
 
         ArkService.getInstance().requestDelegate(mServerSetting, new RequestListener<Delegate>() {
@@ -194,15 +186,15 @@ public class HomeServerSettingFragment extends Fragment {
                     return;
                 }
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideLoadingIndicatorView();
-                        mSwipeRefreshLayout.setRefreshing(false);
-
-                        Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
-                    }
+                getActivity().runOnUiThread(() -> {
+                    hideLoadingIndicatorView();
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
                 });
+
+                loadForging();
+                loadAccount();
+                loadDelegate();
             }
 
             @Override
@@ -211,35 +203,31 @@ public class HomeServerSettingFragment extends Fragment {
                     return;
                 }
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideLoadingIndicatorView();
-                        mSwipeRefreshLayout.setRefreshing(false);
+                String status = delegate.getRate() <= 51 ? getString(R.string.active) : getString(R.string.standby);
+                String productivity = delegate.getProductivity() + getString(R.string.percent_symbol);
+                Long producedBlocks = delegate.getProducedblocks();
+                Long missedblocks = delegate.getMissedblocks();
+                String approval = delegate.getApproval() + getString(R.string.percent_symbol);
 
-                        String status = delegate.getRate() <= 51 ? getString(R.string.active) : getString(R.string.standby);
+                getActivity().runOnUiThread(() -> {
+                    hideLoadingIndicatorView();
+                    mSwipeRefreshLayout.setRefreshing(false);
 
-                        rankTextview.setText(getString(R.string.ranking_status_value,
-                                String.valueOf(delegate.getRate()),
-                                status));
+                    rankTextview.setText(getString(R.string.ranking_status_value,
+                            String.valueOf(delegate.getRate()),
+                            status));
 
-                        String productivity = delegate.getProductivity() + getString(R.string.percent_symbol);
-                        productivityTextview.setText(productivity);
+                    productivityTextview.setText(productivity);
 
-                        Long producedBlocks = delegate.getProducedblocks();
-                        Long missedblocks = delegate.getMissedblocks();
+                    forgedMissedBlocksTextview.setText(getString(R.string.forged_missed_value,
+                            String.valueOf(producedBlocks),
+                            String.valueOf(missedblocks)));
 
-                        forgedMissedBlocksTextview.setText(getString(R.string.forged_missed_value,
-                                String.valueOf(producedBlocks),
-                                String.valueOf(missedblocks)));
-
-                        String approval = delegate.getApproval() + getString(R.string.percent_symbol);
-                        delegateApprovalTextView.setText(approval);
-
-                        loadForging();
-                        loadAccount();
-                    }
+                    delegateApprovalTextView.setText(approval);
                 });
+
+                loadForging();
+                loadAccount();
             }
         });
     }
@@ -254,14 +242,10 @@ public class HomeServerSettingFragment extends Fragment {
                     return;
                 }
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideLoadingIndicatorView();
-                        mSwipeRefreshLayout.setRefreshing(false);
-
-                        Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
-                    }
+                getActivity().runOnUiThread(() -> {
+                    hideLoadingIndicatorView();
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
                 });
             }
 
@@ -271,14 +255,10 @@ public class HomeServerSettingFragment extends Fragment {
                     return;
                 }
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideLoadingIndicatorView();
-                        mSwipeRefreshLayout.setRefreshing(false);
-
-                        versionTextview.setText(peerVersion.getVersion());
-                    }
+                getActivity().runOnUiThread(() -> {
+                    hideLoadingIndicatorView();
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    versionTextview.setText(peerVersion.getVersion());
                 });
             }
         });
@@ -292,14 +272,10 @@ public class HomeServerSettingFragment extends Fragment {
                     return;
                 }
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideLoadingIndicatorView();
-                        mSwipeRefreshLayout.setRefreshing(false);
-
-                        Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
-                    }
+                getActivity().runOnUiThread(() -> {
+                    hideLoadingIndicatorView();
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
                 });
             }
 
@@ -309,15 +285,12 @@ public class HomeServerSettingFragment extends Fragment {
                     return;
                 }
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideLoadingIndicatorView();
-                        mSwipeRefreshLayout.setRefreshing(false);
+                getActivity().runOnUiThread(() -> {
+                    hideLoadingIndicatorView();
+                    mSwipeRefreshLayout.setRefreshing(false);
 
-                        heightTextview.setText(String.valueOf(status.getHeight()));
-                        blocksTextview.setText(String.valueOf(status.getBlocks()));
-                    }
+                    heightTextview.setText(String.valueOf(status.getHeight()));
+                    blocksTextview.setText(String.valueOf(status.getBlocks()));
                 });
             }
         });
@@ -331,14 +304,10 @@ public class HomeServerSettingFragment extends Fragment {
                     return;
                 }
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideLoadingIndicatorView();
-                        mSwipeRefreshLayout.setRefreshing(false);
-
-                        Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
-                    }
+                getActivity().runOnUiThread(() -> {
+                    hideLoadingIndicatorView();
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
                 });
             }
 
@@ -348,29 +317,32 @@ public class HomeServerSettingFragment extends Fragment {
                     return;
                 }
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
+                String fees = null;
+                String rewards = null;
+                String forged = null;
+
+                if (forging != null) {
+                    if (forging.getFees() != null) fees = Utils.formatDecimal(forging.getFees());
+                    if (forging.getRewards() != null) rewards = String.valueOf(Utils.convertToArkBase(forging.getRewards()));
+                    if (forging.getForged() != null) forged = Utils.formatDecimal(forging.getForged());
+                } else {
+                    Log.e("ERROR", "FORGING OBJECT NULL");
+                }
+
+                String finalFees = fees;
+                String finalRewards = rewards;
+                String finalForged = forged;
+
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
                         hideLoadingIndicatorView();
                         mSwipeRefreshLayout.setRefreshing(false);
 
-                        String fees = "";
-                        String rewards = "";
-                        String forged = "";
-
-                        if (forging != null) {
-                            if (forging.getFees() != null) fees = Utils.formatDecimal(forging.getFees());
-                            if (forging.getRewards() != null) rewards = String.valueOf(Utils.convertToArkBase(forging.getRewards()));
-                            if (forging.getForged() != null) forged = Utils.formatDecimal(forging.getForged());
-
-                            feesTextview.setText(fees);
-                            rewardsTextview.setText(rewards);
-                            forgedTextview.setText(forged);
-                        } else {
-                            Log.e("ERR", "FORGING OBJECT NULL");
-                        }
-                    }
-                });
+                        feesTextview.setText(finalFees);
+                        rewardsTextview.setText(finalRewards);
+                        forgedTextview.setText(finalForged);
+                    });
+                }
             }
         });
     }
@@ -385,14 +357,10 @@ public class HomeServerSettingFragment extends Fragment {
 
                 HomeServerSettingFragment.this.balance = -1;
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideLoadingIndicatorView();
-                        mSwipeRefreshLayout.setRefreshing(false);
-
-                        Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
-                    }
+                getActivity().runOnUiThread(() -> {
+                    hideLoadingIndicatorView();
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
                 });
             }
 
@@ -403,19 +371,17 @@ public class HomeServerSettingFragment extends Fragment {
                 }
 
                 HomeServerSettingFragment.this.balance = account.getBalance();
+                String balance = Utils.formatDecimal(HomeServerSettingFragment.this.balance);
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideLoadingIndicatorView();
-                        mSwipeRefreshLayout.setRefreshing(false);
+                getActivity().runOnUiThread(() -> {
+                    hideLoadingIndicatorView();
+                    mSwipeRefreshLayout.setRefreshing(false);
 
-                        addressTextview.setText(account.getAddress());
-                        balanceTextview.setText(Utils.formatDecimal(HomeServerSettingFragment.this.balance));
-
-                        calculateEquivalentInBitcoinUSDandEUR();
-                    }
+                    addressTextview.setText(account.getAddress());
+                    balanceTextview.setText(balance);
                 });
+
+                calculateEquivalentInBitcoinUSDandEUR();
             }
         });
     }
@@ -430,15 +396,12 @@ public class HomeServerSettingFragment extends Fragment {
 
                 HomeServerSettingFragment.this.arkBTCValue = -1;
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideLoadingIndicatorView();
-                        mSwipeRefreshLayout.setRefreshing(false);
-                        balanceBtcEquivalentTextview.setText(getString(R.string.undefined));
+                getActivity().runOnUiThread(() -> {
+                    hideLoadingIndicatorView();
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    balanceBtcEquivalentTextview.setText(getString(R.string.undefined));
 
-                        Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
-                    }
+                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
                 });
             }
 
@@ -450,15 +413,12 @@ public class HomeServerSettingFragment extends Fragment {
 
                 HomeServerSettingFragment.this.arkBTCValue = ticker.getLast();
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideLoadingIndicatorView();
-                        mSwipeRefreshLayout.setRefreshing(false);
-
-                        calculateEquivalentInBitcoinUSDandEUR();
-                    }
+                getActivity().runOnUiThread(() -> {
+                    hideLoadingIndicatorView();
+                    mSwipeRefreshLayout.setRefreshing(false);
                 });
+
+                calculateEquivalentInBitcoinUSDandEUR();
             }
         });
 
@@ -472,15 +432,12 @@ public class HomeServerSettingFragment extends Fragment {
 
                 HomeServerSettingFragment.this.bitcoinUSDValue = -1;
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideLoadingIndicatorView();
-                        mSwipeRefreshLayout.setRefreshing(false);
-                        balanceUsdEquivalentTextview.setText(getString(R.string.undefined));
+                getActivity().runOnUiThread(() -> {
+                    hideLoadingIndicatorView();
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    balanceUsdEquivalentTextview.setText(getString(R.string.undefined));
 
-                        Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
-                    }
+                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
                 });
             }
 
@@ -492,15 +449,12 @@ public class HomeServerSettingFragment extends Fragment {
 
                 HomeServerSettingFragment.this.bitcoinUSDValue = ticker.getLast();
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideLoadingIndicatorView();
-                        mSwipeRefreshLayout.setRefreshing(false);
-
-                        calculateEquivalentInBitcoinUSDandEUR();
-                    }
+                getActivity().runOnUiThread(() -> {
+                    hideLoadingIndicatorView();
+                    mSwipeRefreshLayout.setRefreshing(false);
                 });
+
+                calculateEquivalentInBitcoinUSDandEUR();
             }
         });
 
@@ -514,15 +468,12 @@ public class HomeServerSettingFragment extends Fragment {
 
                 HomeServerSettingFragment.this.bitcoinEURValue = -1;
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideLoadingIndicatorView();
-                        mSwipeRefreshLayout.setRefreshing(false);
-                        balanceEurEquivalentTextview.setText(getString(R.string.undefined));
+                getActivity().runOnUiThread(() -> {
+                    hideLoadingIndicatorView();
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    balanceEurEquivalentTextview.setText(getString(R.string.undefined));
 
-                        Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
-                    }
+                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
                 });
             }
 
@@ -534,15 +485,12 @@ public class HomeServerSettingFragment extends Fragment {
 
                 HomeServerSettingFragment.this.bitcoinEURValue = ticker.getLast();
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideLoadingIndicatorView();
-                        mSwipeRefreshLayout.setRefreshing(false);
-
-                        calculateEquivalentInBitcoinUSDandEUR();
-                    }
+                getActivity().runOnUiThread(() -> {
+                    hideLoadingIndicatorView();
+                    mSwipeRefreshLayout.setRefreshing(false);
                 });
+
+                calculateEquivalentInBitcoinUSDandEUR();
             }
         });
     }
@@ -564,18 +512,31 @@ public class HomeServerSettingFragment extends Fragment {
     private void calculateEquivalentInBitcoinUSDandEUR() {
         if (HomeServerSettingFragment.this != null && HomeServerSettingFragment.this.balance > 0 && HomeServerSettingFragment.this.arkBTCValue > 0) {
             double balanceBtcEquivalent = HomeServerSettingFragment.this.balance * HomeServerSettingFragment.this.arkBTCValue;
-            balanceBtcEquivalentTextview.setText(Utils.formatDecimal(balanceBtcEquivalent));
+            double balanceUSDEquivalent = -1;
+            double balanceEurEquivalent = -1;
 
             if (HomeServerSettingFragment.this.bitcoinUSDValue > 0) {
-                double balanceUSDEquivalent = balanceBtcEquivalent * HomeServerSettingFragment.this.bitcoinUSDValue;
-                balanceUsdEquivalentTextview.setText(Utils.formatDecimal(balanceUSDEquivalent));
+                balanceUSDEquivalent = balanceBtcEquivalent * HomeServerSettingFragment.this.bitcoinUSDValue;
+            } else if (HomeServerSettingFragment.this.bitcoinEURValue > 0) {
+                balanceEurEquivalent = balanceBtcEquivalent * HomeServerSettingFragment.this.bitcoinEURValue;
             }
 
-            if (HomeServerSettingFragment.this.bitcoinEURValue > 0) {
-                double balanceUSDEquivalent = balanceBtcEquivalent * HomeServerSettingFragment.this.bitcoinEURValue;
-                balanceEurEquivalentTextview.setText(Utils.formatDecimal(balanceUSDEquivalent));
-            }
+            String btcEquivalent = Utils.formatDecimal(balanceBtcEquivalent);
+            String usdEquivalent = Utils.formatDecimal(balanceUSDEquivalent);
+            String eurEquivalent = Utils.formatDecimal(balanceEurEquivalent);
+
+            getActivity().runOnUiThread(() -> {
+                balanceBtcEquivalentTextview.setText(btcEquivalent);
+                if (!eurEquivalent.equals("-1")) balanceEurEquivalentTextview.setText(eurEquivalent);
+                if (!usdEquivalent.equals("-1")) balanceUsdEquivalentTextview.setText(usdEquivalent);
+            });
         }
+    }
+
+    public String getTitle() {
+        if (mServerSetting != null)
+        return mServerSetting.getServerName();
+        else return "";
     }
 
 }

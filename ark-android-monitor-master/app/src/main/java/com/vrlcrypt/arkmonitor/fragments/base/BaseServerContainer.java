@@ -1,4 +1,4 @@
-package com.vrlcrypt.arkmonitor.fragments;
+package com.vrlcrypt.arkmonitor.fragments.base;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
@@ -14,9 +14,8 @@ import com.jakewharton.rxbinding2.view.RxView;
 import com.thorcom.testapp.subscription.SubscriptionManager;
 import com.vrlcrypt.arkmonitor.MainActivity;
 import com.vrlcrypt.arkmonitor.R;
-import com.vrlcrypt.arkmonitor.adapters.MainViewPagerAdapter;
-import com.vrlcrypt.arkmonitor.databinding.FragmentMainV2Binding;
-import com.vrlcrypt.arkmonitor.fragments.viewModel.MainFragmentViewModel;
+import com.vrlcrypt.arkmonitor.adapters.BaseServerContainerViewPager;
+import com.vrlcrypt.arkmonitor.databinding.FragmentBaseServerContainerBinding;
 import com.vrlcrypt.arkmonitor.models.ServerSetting;
 
 import java.util.List;
@@ -24,16 +23,20 @@ import java.util.List;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class HomeFragment extends Fragment implements TabLayout.OnTabSelectedListener {
+/**
+ * Created by James Young on 07/05/2018.
+ */
 
-    private FragmentMainV2Binding mBinding;
+public abstract class BaseServerContainer extends Fragment {
+
+    private FragmentBaseServerContainerBinding mBinding;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_main_v2, container, false);
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_base_server_container, container, false);
 
-        mBinding.setViewModel(ViewModelProviders.of(this).get(MainFragmentViewModel.class));
+        mBinding.setViewModel(ViewModelProviders.of(this).get(BaseServerContainerViewModel.class));
 
         setupViewPager(mBinding);
 
@@ -42,26 +45,27 @@ public class HomeFragment extends Fragment implements TabLayout.OnTabSelectedLis
         return mBinding.getRoot();
     }
 
-    private void setupViewPager (FragmentMainV2Binding binding) {
-        binding.viewpager.setAdapter(new MainViewPagerAdapter(getChildFragmentManager()));
-        binding.tabLayout.addOnTabSelectedListener(this);
+    private void setupViewPager (FragmentBaseServerContainerBinding binding) {
+        binding.viewpager.setAdapter(new BaseServerContainerViewPager(getPageType(), getChildFragmentManager()));
+        binding.tabLayout.setupWithViewPager(binding.viewpager);
     }
 
-    private void subscribeToViews(FragmentMainV2Binding binding) {
+    private void subscribeToViews(FragmentBaseServerContainerBinding binding) {
         SubscriptionManager.getInstance().putSubscription(
-                HomeFragment.class.getSimpleName(),
-                RxView.clicks(binding.btnAddNewServer).subscribe(o -> ((MainActivity) getActivity()).showFragment(new SettingsV2Fragment())),
+                subscriptionTag(),
+                RxView.clicks(binding.btnAddNewServer).subscribe(o -> ((MainActivity) getActivity()).selectMenuItem(R.id.nav_settings)),
                 true
         );
     }
 
     private void subscribeToServerSettings() {
         mBinding.tabLayout.removeAllTabs();
-        SubscriptionManager.getInstance().putSubscription(HomeFragment.class.getSimpleName(),
+
+        SubscriptionManager.getInstance().putSubscription(subscriptionTag(),
                 mBinding.getViewModel().serverSettingObserver
                         .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                         .subscribe(this::setupServer),
-        false);
+                false);
     }
 
     @Override
@@ -69,14 +73,13 @@ public class HomeFragment extends Fragment implements TabLayout.OnTabSelectedLis
         super.onStart();
 
         subscribeToViews(mBinding);
-        subscribeToServerSettings();
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-        SubscriptionManager.getInstance().dispose(HomeFragment.class.getSimpleName());
+        SubscriptionManager.getInstance().dispose(subscriptionTag());
     }
 
     private void setupServer (List<ServerSetting> serverSettings) {
@@ -90,22 +93,15 @@ public class HomeFragment extends Fragment implements TabLayout.OnTabSelectedLis
     }
 
     private void addTab (TabLayout tabLayout, ServerSetting serverSetting) {
-        tabLayout.addTab(tabLayout.newTab().setText(serverSetting.getUsername()));
+        tabLayout.addTab(tabLayout.newTab().setText(serverSetting.getServerName()));
     }
 
     private void addPage (ViewPager viewPager, ServerSetting serverSetting) {
-        ((MainViewPagerAdapter) viewPager.getAdapter()).insert(HomeServerSettingFragment.newInstance(serverSetting));
+        ((BaseServerContainerViewPager) viewPager.getAdapter()).insert(serverSetting);
     }
 
-    @Override
-    public void onTabSelected(TabLayout.Tab tab) {
-        mBinding.viewpager.setCurrentItem(tab.getPosition());
-    }
+    public abstract int getPageType ();
 
-    @Override
-    public void onTabUnselected(TabLayout.Tab tab) {}
-
-    @Override
-    public void onTabReselected(TabLayout.Tab tab) {}
+    public abstract String subscriptionTag();
 
 }

@@ -11,7 +11,7 @@ public class ServerSetting implements Serializable {
 
     @PrimaryKey (autoGenerate = true)
     private int uId;
-    private String username;
+    private String serverName;
     private String arkAddress;
     private String publicKey;
     private String ipAddress;
@@ -21,7 +21,7 @@ public class ServerSetting implements Serializable {
     private long notificationInterval;
 
     @Ignore
-    public static final String USERNAME_ATTR = "settings.username";
+    public static final String USERNAME_ATTR = "settings.serverName";
     @Ignore
     public static final String ARK_ADDRESS_ATTR = "settings.ark_address";
     @Ignore
@@ -40,8 +40,8 @@ public class ServerSetting implements Serializable {
     @Ignore
     public ServerSetting() { }
 
-    public ServerSetting(String username, String arkAddress, String publicKey, String ipAddress, int port, boolean sslEnabled, Server server, long notificationInterval) {
-        this.username = username;
+    public ServerSetting(String serverName, String arkAddress, String publicKey, String ipAddress, int port, boolean sslEnabled, Server server, long notificationInterval) {
+        this.serverName = serverName;
         this.arkAddress = arkAddress;
         this.publicKey = publicKey;
         this.ipAddress = ipAddress;
@@ -51,12 +51,12 @@ public class ServerSetting implements Serializable {
         this.notificationInterval = notificationInterval;
     }
 
-    public String getUsername() {
-        return username;
+    public String getServerName() {
+        return serverName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
     }
 
     public String getArkAddress() {

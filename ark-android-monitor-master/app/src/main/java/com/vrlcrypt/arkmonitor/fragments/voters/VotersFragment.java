@@ -1,4 +1,4 @@
-package com.vrlcrypt.arkmonitor.fragments;
+package com.vrlcrypt.arkmonitor.fragments.voters;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,12 +19,20 @@ import com.vrlcrypt.arkmonitor.services.ArkService;
 import com.vrlcrypt.arkmonitor.services.RequestListener;
 import com.vrlcrypt.arkmonitor.utils.Utils;
 
+import static com.vrlcrypt.arkmonitor.fragments.home.HomeServerSettingFragment.ARG_SERVER_SETTING;
+
 public class VotersFragment extends Fragment implements RequestListener<Voters> {
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    public VotersFragment() {
-        // Required empty public constructor
+    public static VotersFragment newInstance (ServerSetting serverSetting) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(ARG_SERVER_SETTING, serverSetting);
+
+        VotersFragment homeServerSettingFragment = new VotersFragment();
+        homeServerSettingFragment.setArguments(bundle);
+
+        return homeServerSettingFragment;
     }
 
     @Override
@@ -38,16 +46,12 @@ public class VotersFragment extends Fragment implements RequestListener<Voters> 
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.voters_refresh_layout);
+        mSwipeRefreshLayout = view.findViewById(R.id.voters_refresh_layout);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
                 R.color.colorPrimaryDark,
                 R.color.colorAccent);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshContent();
-            }
-        });
+
+        mSwipeRefreshLayout.setOnRefreshListener(this::refreshContent);
 
         if (Utils.isOnline(getActivity())) {
             loadVoters();
@@ -68,11 +72,14 @@ public class VotersFragment extends Fragment implements RequestListener<Voters> 
     private void loadVoters() {
         showLoadingIndicatorView();
 
-        ServerSetting serverSetting = Utils.getSettings(getActivity());
-        if (Utils.validatePublicKey(serverSetting.getPublicKey())) {
-            ArkService.getInstance().requestVoters(serverSetting, this);
-        } else {
-            loadAccount();
+        if (getArguments() != null) {
+            ServerSetting serverSetting = (ServerSetting) getArguments().getSerializable(ARG_SERVER_SETTING);
+
+            if (Utils.validatePublicKey(serverSetting.getPublicKey())) {
+                ArkService.getInstance().requestVoters(serverSetting, this);
+            } else {
+                loadAccount();
+            }
         }
     }
 
@@ -117,7 +124,7 @@ public class VotersFragment extends Fragment implements RequestListener<Voters> 
     }
 
     private void refreshContent() {
-        ServerSetting serverSetting = Utils.getSettings(getActivity());
+        ServerSetting serverSetting = (ServerSetting) getArguments().getSerializable(ARG_SERVER_SETTING);
 
         if (Utils.validatePublicKey(serverSetting.getPublicKey())) {
             ArkService.getInstance().requestVoters(serverSetting, this);
@@ -127,7 +134,7 @@ public class VotersFragment extends Fragment implements RequestListener<Voters> 
     }
 
     private void loadAccount() {
-        final ServerSetting serverSetting = Utils.getSettings(getActivity());
+        ServerSetting serverSetting = (ServerSetting) getArguments().getSerializable(ARG_SERVER_SETTING);
 
         ArkService.getInstance().requestAccount(serverSetting, new RequestListener<Account>() {
             @Override
@@ -158,11 +165,6 @@ public class VotersFragment extends Fragment implements RequestListener<Voters> 
                     public void run() {
                         hideLoadingIndicatorView();
                         mSwipeRefreshLayout.setRefreshing(false);
-
-                        serverSetting.setPublicKey(account.getPublicKey());
-                        if (Utils.saveSettings(getActivity(), serverSetting)) {
-                            loadVoters();
-                        }
                     }
                 });
             }
@@ -182,4 +184,5 @@ public class VotersFragment extends Fragment implements RequestListener<Voters> 
             activity.hideLoadingIndicatorView();
         }
     }
+
 }

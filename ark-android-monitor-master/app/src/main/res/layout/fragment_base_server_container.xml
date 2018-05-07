@@ -4,7 +4,7 @@
 
         <variable
             name="viewModel"
-            type="com.vrlcrypt.arkmonitor.fragments.viewModel.MainFragmentViewModel" />
+            type="com.vrlcrypt.arkmonitor.fragments.base.BaseServerContainerViewModel" />
 
         <import type="android.view.View" />
 

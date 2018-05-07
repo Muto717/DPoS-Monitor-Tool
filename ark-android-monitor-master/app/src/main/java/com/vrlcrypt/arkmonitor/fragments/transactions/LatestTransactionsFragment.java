@@ -1,4 +1,4 @@
-package com.vrlcrypt.arkmonitor.fragments;
+package com.vrlcrypt.arkmonitor.fragments.transactions;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,17 +20,24 @@ import com.vrlcrypt.arkmonitor.utils.Utils;
 
 import java.util.List;
 
+import static com.vrlcrypt.arkmonitor.fragments.home.HomeServerSettingFragment.ARG_SERVER_SETTING;
+
 public class LatestTransactionsFragment extends Fragment implements RequestListener<List<Transaction>> {
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    public LatestTransactionsFragment() {
-        // Required empty public constructor
+    public static LatestTransactionsFragment newInstance (ServerSetting serverSetting) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(ARG_SERVER_SETTING, serverSetting);
+
+        LatestTransactionsFragment homeServerSettingFragment = new LatestTransactionsFragment();
+        homeServerSettingFragment.setArguments(bundle);
+
+        return homeServerSettingFragment;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_latest_transactions, container, false);
     }
@@ -39,7 +46,7 @@ public class LatestTransactionsFragment extends Fragment implements RequestListe
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.latest_transactions_refresh_layout);
+        mSwipeRefreshLayout = view.findViewById(R.id.latest_transactions_refresh_layout);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
                 R.color.colorPrimaryDark,
                 R.color.colorAccent);
@@ -77,7 +84,7 @@ public class LatestTransactionsFragment extends Fragment implements RequestListe
     }
 
     private void refreshContent() {
-        ServerSetting serverSetting = Utils.getSettings(getActivity());
+        ServerSetting serverSetting = (ServerSetting) getArguments().getSerializable(ARG_SERVER_SETTING);
         ArkService.getInstance().requestLatestTransactions(serverSetting, this);
     }
 
