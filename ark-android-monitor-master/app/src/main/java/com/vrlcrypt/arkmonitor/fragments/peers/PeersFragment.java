@@ -20,7 +20,7 @@ import com.vrlcrypt.arkmonitor.utils.Utils;
 
 import java.util.List;
 
-import static com.vrlcrypt.arkmonitor.fragments.home.HomeServerSettingFragment.ARG_SERVER_SETTING;
+import static com.vrlcrypt.arkmonitor.fragments.info.HomeServerSettingFragment.ARG_SERVER_SETTING;
 
 public class PeersFragment extends Fragment implements RequestListener<List<Peer>> {
 

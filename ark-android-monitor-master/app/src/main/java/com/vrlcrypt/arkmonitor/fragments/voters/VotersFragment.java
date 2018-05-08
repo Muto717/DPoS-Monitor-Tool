@@ -19,7 +19,7 @@ import com.vrlcrypt.arkmonitor.services.ArkService;
 import com.vrlcrypt.arkmonitor.services.RequestListener;
 import com.vrlcrypt.arkmonitor.utils.Utils;
 
-import static com.vrlcrypt.arkmonitor.fragments.home.HomeServerSettingFragment.ARG_SERVER_SETTING;
+import static com.vrlcrypt.arkmonitor.fragments.info.HomeServerSettingFragment.ARG_SERVER_SETTING;
 
 public class VotersFragment extends Fragment implements RequestListener<Voters> {
 

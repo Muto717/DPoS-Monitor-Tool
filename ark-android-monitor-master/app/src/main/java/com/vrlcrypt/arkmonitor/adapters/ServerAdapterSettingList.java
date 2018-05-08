@@ -51,8 +51,11 @@ public class ServerAdapterSettingList extends RecyclerView.Adapter<ServerSetting
     @Override
     public void removeServerSettingViewModel(SettingViewModel viewModel) {
         int index = mDataSource.indexOf(viewModel);
-        mDataSource.remove(index);
-        notifyItemRemoved(index);
+
+        if (index != 1) {
+            mDataSource.remove(index);
+            notifyItemRemoved(index);
+        }
     }
 
 }

@@ -356,7 +356,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:onClick="@{onClick}"
+                android:onClickListener="@{onClick}"
                 android:text="@string/save_action" />
 
             <Button
@@ -365,7 +365,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:onClick="@{onClick}"
+                android:onClickListener="@{onClick}"
                 android:text="Delete" />
 
         </LinearLayout>

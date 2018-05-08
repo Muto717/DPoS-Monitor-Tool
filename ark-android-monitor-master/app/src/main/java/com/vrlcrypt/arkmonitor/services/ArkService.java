@@ -21,6 +21,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.Call;
@@ -30,6 +31,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class ArkService {
+
     private static ArkService instance;
     private final OkHttpClient client;
 
@@ -52,8 +54,11 @@ public class ArkService {
     private static final String HTTP_PROTOCOL = "http://";
     private static final String HTTPS_PROTOCOL = "https://";
 
+    private HashMap<String, List<Call>> openRequests;
+
     private ArkService() {
         client = new OkHttpClient();
+        openRequests = new HashMap<>();
     }
 
     public static synchronized ArkService getInstance() {
@@ -344,7 +349,7 @@ public class ArkService {
         });
     }
 
-    public void requestPeerVersion(ServerSetting serverSetting, final RequestListener<PeerVersion> listener) {
+    public void requestPeerVersion(String requestFrom, ServerSetting serverSetting, final RequestListener<PeerVersion> listener) {
         if (serverSetting.getServer().isCustomServer()) {
             if (!Utils.validateIpAddress(serverSetting.getIpAddress())) {
                 listener.onFailure(new Exception("Invalid IP Address"));
@@ -362,7 +367,9 @@ public class ArkService {
         Request request = new Request.Builder()
                 .url(urlRequest)
                 .build();
-        client.newCall(request).enqueue(new Callback() {
+        Call call = client.newCall(request);
+
+        call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 listener.onFailure(e);
@@ -380,6 +387,9 @@ public class ArkService {
                 }
             }
         });
+
+        insertCall(requestFrom, call);
+
     }
 
     public void requestStatus(ServerSetting serverSetting, final RequestListener<Status> listener) {
@@ -400,7 +410,8 @@ public class ArkService {
         Request request = new Request.Builder()
                 .url(urlRequest)
                 .build();
-        client.newCall(request).enqueue(new Callback() {
+        Call call = client.newCall(request);
+        call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 listener.onFailure(e);
@@ -418,6 +429,9 @@ public class ArkService {
                 }
             }
         });
+
+        insertCall(serverSetting.getServerName(), call);
+
     }
 
     public void requestForging(ServerSetting serverSetting, final RequestListener<Forging> listener) {
@@ -464,7 +478,7 @@ public class ArkService {
         });
     }
 
-    public void requestDelegate(ServerSetting serverSetting, final RequestListener<Delegate> listener) {
+    public void requestDelegate(String requestFrom, ServerSetting serverSetting, final RequestListener<Delegate> listener) {
         if (serverSetting.getServer().isCustomServer()) {
             if (!Utils.validateIpAddress(serverSetting.getIpAddress())) {
                 listener.onFailure(new Exception("Invalid IP Address"));
@@ -488,7 +502,9 @@ public class ArkService {
         Request request = new Request.Builder()
                 .url(urlRequest)
                 .build();
-        client.newCall(request).enqueue(new Callback() {
+        Call call = client.newCall(request);
+
+        call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 listener.onFailure(e);
@@ -514,6 +530,8 @@ public class ArkService {
                 }
             }
         });
+
+        insertCall(requestFrom, call);
     }
 
     public void requestLastBlockForged(ServerSetting serverSetting, final RequestListener<Block> listener) {
@@ -540,7 +558,9 @@ public class ArkService {
         Request request = new Request.Builder()
                 .url(urlRequest)
                 .build();
-        client.newCall(request).enqueue(new Callback() {
+
+        Call call = client.newCall(request);
+        call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 listener.onFailure(e);
@@ -571,9 +591,12 @@ public class ArkService {
                     }
                 } catch (JSONException e) {
                     listener.onFailure(e);
-                }
+                }        insertCall(serverSetting.getServerName(), call);
+
             }
         });
+
+        insertCall(serverSetting.getServerName(), call);
     }
 
     public void requestBlocks(ServerSetting serverSetting, final RequestListener<List<Block>> listener) {
@@ -600,7 +623,10 @@ public class ArkService {
         Request request = new Request.Builder()
                 .url(urlRequest)
                 .build();
-        client.newCall(request).enqueue(new Callback() {
+
+        Call call = client.newCall(request);
+
+        call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 listener.onFailure(e);
@@ -693,6 +719,28 @@ public class ArkService {
         String apiUrl = url.replace(IP_ATTR, serverSetting.getIpAddress());
         apiUrl = apiUrl.replace(PORT_ATTR, String.valueOf(serverSetting.getPort()));
         return (serverSetting.getSslEnabled() ? HTTPS_PROTOCOL : HTTP_PROTOCOL) + apiUrl;
+    }
+
+    public void insertCall (String requestFrom, Call call) {
+        if (openRequests.containsKey(requestFrom))
+            openRequests.get(requestFrom).add(call);
+        else  {
+            List<Call> callList = new ArrayList<>();
+            callList.add(call);
+
+            openRequests.put(requestFrom, callList);
+        }
+    }
+
+    public void cancelCall (String requestFrom) {
+        Log.d("ArkService", "Canceling calls for " + requestFrom + " amount:" + (openRequests.containsKey(requestFrom) ? openRequests.get(requestFrom).size() : "0"));
+
+        if (openRequests.containsKey(requestFrom)) {
+            for (Call call : openRequests.get(requestFrom))
+                call.cancel();
+
+            openRequests.remove(requestFrom);
+        }
     }
 
 }

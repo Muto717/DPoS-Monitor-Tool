@@ -28,7 +28,7 @@
             android:layout_alignParentEnd="true"
             android:layout_margin="16dp"
             android:src="@drawable/ic_add_black_24dp"
-            android:onClick="@{onClick}" />
+            android:onClickListener="@{onClick}" />
 
         <TextView
             android:id="@+id/txt_no_servers"

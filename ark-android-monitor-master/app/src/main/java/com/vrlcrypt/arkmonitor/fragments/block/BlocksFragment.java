@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import com.vrlcrypt.arkmonitor.MainActivity;
 import com.vrlcrypt.arkmonitor.R;
 import com.vrlcrypt.arkmonitor.adapters.BlocksAdapter;
-import com.vrlcrypt.arkmonitor.fragments.home.HomeServerSettingFragment;
+import com.vrlcrypt.arkmonitor.fragments.info.HomeServerSettingFragment;
 import com.vrlcrypt.arkmonitor.models.Block;
 import com.vrlcrypt.arkmonitor.models.ServerSetting;
 import com.vrlcrypt.arkmonitor.services.ArkService;

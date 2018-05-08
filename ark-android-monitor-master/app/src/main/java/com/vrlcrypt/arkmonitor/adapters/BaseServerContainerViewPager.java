@@ -8,7 +8,7 @@ import com.vrlcrypt.arkmonitor.fragments.delegates.DelegatesFragment;
 import com.vrlcrypt.arkmonitor.fragments.peers.PeersFragment;
 import com.vrlcrypt.arkmonitor.fragments.transactions.LatestTransactionsFragment;
 import com.vrlcrypt.arkmonitor.fragments.block.BlocksFragment;
-import com.vrlcrypt.arkmonitor.fragments.home.HomeServerSettingFragment;
+import com.vrlcrypt.arkmonitor.fragments.info.HomeServerSettingFragment;
 import com.vrlcrypt.arkmonitor.fragments.voters.VotersFragment;
 import com.vrlcrypt.arkmonitor.fragments.votes.VotesFragment;
 import com.vrlcrypt.arkmonitor.models.ServerSetting;

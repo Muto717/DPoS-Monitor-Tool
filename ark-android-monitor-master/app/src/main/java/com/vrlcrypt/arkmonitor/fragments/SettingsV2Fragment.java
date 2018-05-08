@@ -94,6 +94,7 @@ public class SettingsV2Fragment extends Fragment implements OnClickListener {
                 SettingsDatabase.getInstance(getContext()).insert(new ServerSetting())
                         .doOnComplete(() -> mBinding.listSetting.scrollToPosition(0))
                         .subscribe();
+
                 break;
             }
         }

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.vrlcrypt.arkmonitor.fragments.home.HomeServerSettingFragment.ARG_SERVER_SETTING;
+import static com.vrlcrypt.arkmonitor.fragments.info.HomeServerSettingFragment.ARG_SERVER_SETTING;
 
 public class DelegatesFragment extends Fragment implements RequestListener<List<Delegate>>{
 

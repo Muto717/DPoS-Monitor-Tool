@@ -1,4 +1,4 @@
-package com.vrlcrypt.arkmonitor.fragments.home;
+package com.vrlcrypt.arkmonitor.fragments.info;
 
 import com.vrlcrypt.arkmonitor.adapters.BaseServerContainerViewPager;
 import com.vrlcrypt.arkmonitor.fragments.base.BaseServerContainer;

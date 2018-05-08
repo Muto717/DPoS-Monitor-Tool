@@ -15,6 +15,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class ExchangeService {
+
     private static ExchangeService instance;
     private final OkHttpClient client;
     private static final String URL_TICKER = "https://bittrex.com/api/v1.1/public/getmarketsummary?market=btc-ark";
@@ -37,7 +38,8 @@ public class ExchangeService {
         Request request= new Request.Builder()
                 .url(URL_TICKER)
                 .build();
-        client.newCall(request).enqueue(new Callback() {
+        Call call = client.newCall(request);
+        call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 listener.onFailure(e);
@@ -63,6 +65,7 @@ public class ExchangeService {
                 }
             }
         });
+
     }
 
     public void requestBitcoinUSDTicker(final RequestListener<Ticker> listener) {
@@ -97,5 +100,8 @@ public class ExchangeService {
                 }
             }
         });
+
     }
+
+
 }

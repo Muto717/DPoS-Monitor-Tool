@@ -1,4 +1,4 @@
-package com.vrlcrypt.arkmonitor.fragments.home;
+package com.vrlcrypt.arkmonitor.fragments.info;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.thorcom.testapp.subscription.SubscriptionManager;
 import com.vrlcrypt.arkmonitor.MainActivity;
 import com.vrlcrypt.arkmonitor.R;
 import com.vrlcrypt.arkmonitor.models.Account;
@@ -21,8 +22,11 @@ import com.vrlcrypt.arkmonitor.models.Status;
 import com.vrlcrypt.arkmonitor.models.Ticker;
 import com.vrlcrypt.arkmonitor.services.ExchangeService;
 import com.vrlcrypt.arkmonitor.services.ArkService;
+import com.vrlcrypt.arkmonitor.services.ExchangeServiceV2;
 import com.vrlcrypt.arkmonitor.services.RequestListener;
 import com.vrlcrypt.arkmonitor.utils.Utils;
+
+import io.reactivex.functions.Consumer;
 
 public class HomeServerSettingFragment extends Fragment {
 
@@ -53,7 +57,7 @@ public class HomeServerSettingFragment extends Fragment {
 
     private ServerSetting mServerSetting;
 
-    public static HomeServerSettingFragment newInstance (ServerSetting serverSetting) {
+    public static HomeServerSettingFragment newInstance(ServerSetting serverSetting) {
         Bundle bundle = new Bundle();
         bundle.putSerializable(ARG_SERVER_SETTING, serverSetting);
 
@@ -97,12 +101,7 @@ public class HomeServerSettingFragment extends Fragment {
                 R.color.colorPrimaryDark,
                 R.color.colorAccent);
 
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                loadRequests();
-            }
-        });
+        mSwipeRefreshLayout.setOnRefreshListener(this::loadRequests);
 
         mServerSetting = (ServerSetting) getArguments().getSerializable(ARG_SERVER_SETTING);
     }
@@ -115,8 +114,32 @@ public class HomeServerSettingFragment extends Fragment {
             showLoadingIndicatorView();
             loadRequests();
         } else {
-            Utils.showMessage(getResources().getString(R.string.internet_off), getView());
+            if (HomeServerSettingFragment.this.isAdded())
+                Utils.showMessage(getResources().getString(R.string.internet_off), getView());
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (Utils.isOnline(getActivity()))
+            SubscriptionManager.getInstance().putSubscription(mServerSetting.getServerName(),
+                    ((MainActivity) getActivity()).getExchangeService().btcPriceTickers().subscribe(priceTickers -> {
+                        if (priceTickers.getBtcEur() != null) HomeServerSettingFragment.this.bitcoinEURValue = priceTickers.getBtcEur().getLast();
+                        if (priceTickers.getBtcUsd() != null) HomeServerSettingFragment.this.bitcoinUSDValue = priceTickers.getBtcUsd().getLast();
+                        if (priceTickers.getBtcUsd() != null) HomeServerSettingFragment.this.arkBTCValue = priceTickers.getBtc().getLast();
+
+                        calculateEquivalentInBitcoinUSDandEUR();
+                    }), false);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        ArkService.getInstance().cancelCall(mServerSetting.getServerName());
+        SubscriptionManager.getInstance().dispose(mServerSetting.getServerName());
     }
 
     @Override
@@ -133,7 +156,6 @@ public class HomeServerSettingFragment extends Fragment {
         loadPeerVersion();
         loadStatus();
         loadLastForgedBlock();
-        loadTicker();
     }
 
     private void loadLastForgedBlock() {
@@ -149,7 +171,8 @@ public class HomeServerSettingFragment extends Fragment {
                 getActivity().runOnUiThread(() -> {
                     hideLoadingIndicatorView();
                     mSwipeRefreshLayout.setRefreshing(false);
-                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
+                    if (HomeServerSettingFragment.this.isAdded())
+                        Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
                 });
             }
 
@@ -158,7 +181,6 @@ public class HomeServerSettingFragment extends Fragment {
                 if (!isAdded()) {
                     return;
                 }
-
 
                 final CharSequence timeAgo = (block != null && block.getTimestamp() > 0) ? Utils.getTimeAgo(block.getTimestamp()) : getString(R.string.not_forging);
 
@@ -177,7 +199,7 @@ public class HomeServerSettingFragment extends Fragment {
             usernameTextview.setText(mServerSetting.getServerName());
         }
 
-        ArkService.getInstance().requestDelegate(mServerSetting, new RequestListener<Delegate>() {
+        ArkService.getInstance().requestDelegate(mServerSetting.getServerName(), mServerSetting, new RequestListener<Delegate>() {
             @Override
             public void onFailure(Exception e) {
                 Log.e("ERR", "Error loading delegate", e);
@@ -189,7 +211,8 @@ public class HomeServerSettingFragment extends Fragment {
                 getActivity().runOnUiThread(() -> {
                     hideLoadingIndicatorView();
                     mSwipeRefreshLayout.setRefreshing(false);
-                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
+                    if (HomeServerSettingFragment.this.isAdded())
+                        Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
                 });
 
                 loadForging();
@@ -233,7 +256,7 @@ public class HomeServerSettingFragment extends Fragment {
     }
 
     private void loadPeerVersion() {
-        ArkService.getInstance().requestPeerVersion(mServerSetting, new RequestListener<PeerVersion>() {
+        ArkService.getInstance().requestPeerVersion(mServerSetting.getServerName(), mServerSetting, new RequestListener<PeerVersion>() {
             @Override
             public void onFailure(Exception e) {
                 Log.e("ERR", "Error loading peer version", e);
@@ -245,7 +268,8 @@ public class HomeServerSettingFragment extends Fragment {
                 getActivity().runOnUiThread(() -> {
                     hideLoadingIndicatorView();
                     mSwipeRefreshLayout.setRefreshing(false);
-                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
+                    if (HomeServerSettingFragment.this.isAdded())
+                        Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
                 });
             }
 
@@ -275,7 +299,8 @@ public class HomeServerSettingFragment extends Fragment {
                 getActivity().runOnUiThread(() -> {
                     hideLoadingIndicatorView();
                     mSwipeRefreshLayout.setRefreshing(false);
-                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
+                    if (HomeServerSettingFragment.this.isAdded())
+                        Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
                 });
             }
 
@@ -307,7 +332,8 @@ public class HomeServerSettingFragment extends Fragment {
                 getActivity().runOnUiThread(() -> {
                     hideLoadingIndicatorView();
                     mSwipeRefreshLayout.setRefreshing(false);
-                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
+                    if (HomeServerSettingFragment.this.isAdded())
+                        Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
                 });
             }
 
@@ -323,8 +349,10 @@ public class HomeServerSettingFragment extends Fragment {
 
                 if (forging != null) {
                     if (forging.getFees() != null) fees = Utils.formatDecimal(forging.getFees());
-                    if (forging.getRewards() != null) rewards = String.valueOf(Utils.convertToArkBase(forging.getRewards()));
-                    if (forging.getForged() != null) forged = Utils.formatDecimal(forging.getForged());
+                    if (forging.getRewards() != null)
+                        rewards = String.valueOf(Utils.convertToArkBase(forging.getRewards()));
+                    if (forging.getForged() != null)
+                        forged = Utils.formatDecimal(forging.getForged());
                 } else {
                     Log.e("ERROR", "FORGING OBJECT NULL");
                 }
@@ -360,7 +388,9 @@ public class HomeServerSettingFragment extends Fragment {
                 getActivity().runOnUiThread(() -> {
                     hideLoadingIndicatorView();
                     mSwipeRefreshLayout.setRefreshing(false);
-                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
+
+                    if (HomeServerSettingFragment.this.isAdded())
+                        Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
                 });
             }
 
@@ -386,115 +416,6 @@ public class HomeServerSettingFragment extends Fragment {
         });
     }
 
-    private void loadTicker() {
-        ExchangeService.getInstance().requestTicker(new RequestListener<Ticker>() {
-            @Override
-            public void onFailure(Exception e) {
-                if (!isAdded()) {
-                    return;
-                }
-
-                HomeServerSettingFragment.this.arkBTCValue = -1;
-
-                getActivity().runOnUiThread(() -> {
-                    hideLoadingIndicatorView();
-                    mSwipeRefreshLayout.setRefreshing(false);
-                    balanceBtcEquivalentTextview.setText(getString(R.string.undefined));
-
-                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
-                });
-            }
-
-            @Override
-            public void onResponse(final Ticker ticker) {
-                if (!isAdded()) {
-                    return;
-                }
-
-                HomeServerSettingFragment.this.arkBTCValue = ticker.getLast();
-
-                getActivity().runOnUiThread(() -> {
-                    hideLoadingIndicatorView();
-                    mSwipeRefreshLayout.setRefreshing(false);
-                });
-
-                calculateEquivalentInBitcoinUSDandEUR();
-            }
-        });
-
-
-        ExchangeService.getInstance().requestBitcoinUSDTicker(new RequestListener<Ticker>() {
-            @Override
-            public void onFailure(Exception e) {
-                if (!isAdded()) {
-                    return;
-                }
-
-                HomeServerSettingFragment.this.bitcoinUSDValue = -1;
-
-                getActivity().runOnUiThread(() -> {
-                    hideLoadingIndicatorView();
-                    mSwipeRefreshLayout.setRefreshing(false);
-                    balanceUsdEquivalentTextview.setText(getString(R.string.undefined));
-
-                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
-                });
-            }
-
-            @Override
-            public void onResponse(Ticker ticker) {
-                if (!isAdded()) {
-                    return;
-                }
-
-                HomeServerSettingFragment.this.bitcoinUSDValue = ticker.getLast();
-
-                getActivity().runOnUiThread(() -> {
-                    hideLoadingIndicatorView();
-                    mSwipeRefreshLayout.setRefreshing(false);
-                });
-
-                calculateEquivalentInBitcoinUSDandEUR();
-            }
-        });
-
-
-        ExchangeService.getInstance().requestBitcoinEURTicker(new RequestListener<Ticker>() {
-            @Override
-            public void onFailure(Exception e) {
-                if (!isAdded()) {
-                    return;
-                }
-
-                HomeServerSettingFragment.this.bitcoinEURValue = -1;
-
-                getActivity().runOnUiThread(() -> {
-                    hideLoadingIndicatorView();
-                    mSwipeRefreshLayout.setRefreshing(false);
-                    balanceEurEquivalentTextview.setText(getString(R.string.undefined));
-
-                    Utils.showMessage(getString(R.string.unable_to_retrieve_data), getView());
-                });
-            }
-
-            @Override
-            public void onResponse(Ticker ticker) {
-                if (!isAdded()) {
-                    return;
-                }
-
-                HomeServerSettingFragment.this.bitcoinEURValue = ticker.getLast();
-
-                getActivity().runOnUiThread(() -> {
-                    hideLoadingIndicatorView();
-                    mSwipeRefreshLayout.setRefreshing(false);
-                });
-
-                calculateEquivalentInBitcoinUSDandEUR();
-            }
-        });
-    }
-
     private void showLoadingIndicatorView() {
         MainActivity activity = (MainActivity) getActivity();
         if (activity != null) {
@@ -510,8 +431,9 @@ public class HomeServerSettingFragment extends Fragment {
     }
 
     private void calculateEquivalentInBitcoinUSDandEUR() {
-        if (HomeServerSettingFragment.this != null && HomeServerSettingFragment.this.balance > 0 && HomeServerSettingFragment.this.arkBTCValue > 0) {
+        if (HomeServerSettingFragment.this.balance > 0 && HomeServerSettingFragment.this.arkBTCValue > 0) {
             double balanceBtcEquivalent = HomeServerSettingFragment.this.balance * HomeServerSettingFragment.this.arkBTCValue;
+
             double balanceUSDEquivalent = -1;
             double balanceEurEquivalent = -1;
 
@@ -527,16 +449,21 @@ public class HomeServerSettingFragment extends Fragment {
 
             getActivity().runOnUiThread(() -> {
                 balanceBtcEquivalentTextview.setText(btcEquivalent);
-                if (!eurEquivalent.equals("-1")) balanceEurEquivalentTextview.setText(eurEquivalent);
-                if (!usdEquivalent.equals("-1")) balanceUsdEquivalentTextview.setText(usdEquivalent);
+
+                if (!eurEquivalent.equals("-1"))
+                    balanceEurEquivalentTextview.setText(eurEquivalent);
+
+                if (!usdEquivalent.equals("-1"))
+                    balanceUsdEquivalentTextview.setText(usdEquivalent);
             });
         }
     }
 
     public String getTitle() {
         if (mServerSetting != null)
-        return mServerSetting.getServerName();
+            return mServerSetting.getServerName();
         else return "";
     }
+
 
 }

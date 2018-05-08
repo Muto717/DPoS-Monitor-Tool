@@ -26,4 +26,7 @@ public interface SettingDao {
     @Query("SELECT COUNT(*)  FROM SERVER_SETTINGS")
     int getCount();
 
+    @Query("SELECT * FROM SERVER_SETTINGS WHERE serverName = :name")
+    ServerSetting getByName(String name);
+
 }

@@ -16,14 +16,14 @@ import android.view.View;
 
 import com.vrlcrypt.arkmonitor.fragments.block.BlocksContainerFragment;
 import com.vrlcrypt.arkmonitor.fragments.delegates.DelegateContainerFragment;
-import com.vrlcrypt.arkmonitor.fragments.home.HomeContainerFragment;
+import com.vrlcrypt.arkmonitor.fragments.info.HomeContainerFragment;
 import com.vrlcrypt.arkmonitor.fragments.peers.PeersContainerFragment;
 import com.vrlcrypt.arkmonitor.fragments.SettingsV2Fragment;
 import com.vrlcrypt.arkmonitor.fragments.voters.VoterContainerFragment;
-import com.vrlcrypt.arkmonitor.fragments.voters.VotersFragment;
 import com.vrlcrypt.arkmonitor.fragments.votes.VotesContainerFragment;
 import com.vrlcrypt.arkmonitor.fragments.transactions.TransactionsContainerFragment;
 import com.vrlcrypt.arkmonitor.scheduler.ForgingAlarmReceiver;
+import com.vrlcrypt.arkmonitor.services.ExchangeServiceV2;
 import com.vrlcrypt.arkmonitor.utils.Utils;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -35,12 +35,16 @@ public class MainActivity extends AppCompatActivity
     private ActionBarDrawerToggle mToggle;
     private Menu mMenu;
 
+    private ExchangeServiceV2 exchangeService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        exchangeService = new ExchangeServiceV2();
 
         mLoadingIndicatorView = findViewById(R.id.loadingIndicator);
 
@@ -166,6 +170,10 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setCheckedItem(menuItem);
         onNavigationItemSelected(navigationView.getMenu().findItem(menuItem));
+    }
+
+    public ExchangeServiceV2 getExchangeService() {
+        return exchangeService;
     }
 
     enum NavItem {

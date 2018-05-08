@@ -54,4 +54,8 @@ public abstract class SettingsDatabase extends RoomDatabase {
         return Maybe.fromCallable(() -> settingDao().getCount()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
 
+    public Maybe<ServerSetting> getServerSettingByName(String name) {
+        return Maybe.fromCallable(() -> settingDao().getByName(name)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
+
 }
