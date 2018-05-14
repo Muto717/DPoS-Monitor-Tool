@@ -16,7 +16,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 
-@Database(entities = {ServerSetting.class}, version = 2)
+@Database(entities = {ServerSetting.class}, version = 3)
 @TypeConverters(com.vrlcrypt.arkmonitor.persistance.TypeConverters.class)
 public abstract class SettingsDatabase extends RoomDatabase {
 

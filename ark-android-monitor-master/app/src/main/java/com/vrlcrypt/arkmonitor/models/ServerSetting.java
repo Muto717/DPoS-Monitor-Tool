@@ -38,7 +38,9 @@ public class ServerSetting implements Serializable {
     public static final String NOTIFICATION_INTERVAL_ATTR = "settings.notification_interval_attr";
 
     @Ignore
-    public ServerSetting() { }
+    public ServerSetting() {
+        this.serverName = "New Server";
+    }
 
     public ServerSetting(String serverName, String arkAddress, String publicKey, String ipAddress, int port, boolean sslEnabled, Server server, long notificationInterval) {
         this.serverName = serverName;

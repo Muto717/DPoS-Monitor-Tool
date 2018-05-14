@@ -2,6 +2,7 @@ package com.vrlcrypt.arkmonitor.fragments;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,6 +80,17 @@ public class SettingsV2Fragment extends Fragment implements OnClickListener {
     }
 
     @Override
+    public void onPause() {
+        ServerSetting incompleteServerSetting = mSettingAdapter.getIncompleteServerSetting();
+
+        if (mSettingAdapter.containsIncomplete() && incompleteServerSetting != null)
+            SettingsDatabase.getInstance(getContext()).delete(incompleteServerSetting);
+
+        super.onPause();
+
+    }
+
+    @Override
     public void onDestroy() {
         SubscriptionManager.getInstance().dispose(SettingsV2Fragment.class.getSimpleName());
 
@@ -91,9 +103,12 @@ public class SettingsV2Fragment extends Fragment implements OnClickListener {
         switch (v.getId()) {
             case R.id.btn_add_new_server: {
 
-                SettingsDatabase.getInstance(getContext()).insert(new ServerSetting())
-                        .doOnComplete(() -> mBinding.listSetting.scrollToPosition(0))
-                        .subscribe();
+                if (!mSettingAdapter.containsIncomplete())
+                    SettingsDatabase.getInstance(getContext()).insert(new ServerSetting())
+                            .doOnComplete(() -> mBinding.listSetting.scrollToPosition(0))
+                            .subscribe();
+                else
+                    Snackbar.make(v, "You already have an incomplete server spec", Snackbar.LENGTH_LONG).show();
 
                 break;
             }

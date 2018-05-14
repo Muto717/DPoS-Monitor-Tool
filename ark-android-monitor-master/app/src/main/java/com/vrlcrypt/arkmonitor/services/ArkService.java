@@ -479,6 +479,8 @@ public class ArkService {
     }
 
     public void requestDelegate(String requestFrom, ServerSetting serverSetting, final RequestListener<Delegate> listener) {
+        Log.d(ArkService.class.getSimpleName(), "RequestFrom: " + requestFrom + " ServerSetting Name: " + serverSetting.getServerName());
+
         if (serverSetting.getServer().isCustomServer()) {
             if (!Utils.validateIpAddress(serverSetting.getIpAddress())) {
                 listener.onFailure(new Exception("Invalid IP Address"));
@@ -513,6 +515,8 @@ public class ArkService {
             @Override
             public void onResponse(Call call, final Response response) throws IOException {
                 String jsonData = response.body().string();
+                Log.d("Delegate", jsonData);
+
                 try {
                     JSONObject jsonObject = new JSONObject(jsonData);
 

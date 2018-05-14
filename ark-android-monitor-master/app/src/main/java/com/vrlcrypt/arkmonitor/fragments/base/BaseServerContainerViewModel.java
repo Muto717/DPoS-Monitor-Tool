@@ -9,15 +9,27 @@ import com.thorcom.testapp.subscription.SubscriptionManager;
 import com.vrlcrypt.arkmonitor.models.ServerSetting;
 import com.vrlcrypt.arkmonitor.persistance.SettingsDatabase;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.functions.Function;
 
 public class BaseServerContainerViewModel extends AndroidViewModel {
 
     public ObservableBoolean hasServerSetup;
 
-    public Flowable<List<ServerSetting>> serverSettingObserver = SettingsDatabase.getInstance(getApplication()).settingDao().getSettings();
+    public Flowable<List<ServerSetting>> serverSettingObserver =
+            SettingsDatabase.getInstance(getApplication()).settingDao().getSettings().map(serverSettings -> {
+                List<ServerSetting> newList = new ArrayList<>();
+
+                for (ServerSetting serverSetting : serverSettings)
+                    if (!serverSetting.getServerName().equals("")
+                            && !serverSetting.getServerName().equals("New Server"))
+                        newList.add(serverSetting);
+
+                return newList;
+            });
 
     public BaseServerContainerViewModel(@NonNull Application application) {
         super(application);

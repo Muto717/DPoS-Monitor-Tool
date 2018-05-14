@@ -47,6 +47,7 @@ public abstract class BaseServerContainer extends Fragment {
 
     private void setupViewPager (FragmentBaseServerContainerBinding binding) {
         binding.viewpager.setAdapter(new BaseServerContainerViewPager(getPageType(), getChildFragmentManager()));
+        binding.viewpager.setOffscreenPageLimit(0);
         binding.tabLayout.setupWithViewPager(binding.viewpager);
     }
 

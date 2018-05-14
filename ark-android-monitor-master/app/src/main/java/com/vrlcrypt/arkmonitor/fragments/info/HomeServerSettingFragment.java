@@ -123,15 +123,19 @@ public class HomeServerSettingFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        if (Utils.isOnline(getActivity()))
+        if (Utils.isOnline(getActivity())) {
             SubscriptionManager.getInstance().putSubscription(mServerSetting.getServerName(),
                     ((MainActivity) getActivity()).getExchangeService().btcPriceTickers().subscribe(priceTickers -> {
-                        if (priceTickers.getBtcEur() != null) HomeServerSettingFragment.this.bitcoinEURValue = priceTickers.getBtcEur().getLast();
-                        if (priceTickers.getBtcUsd() != null) HomeServerSettingFragment.this.bitcoinUSDValue = priceTickers.getBtcUsd().getLast();
-                        if (priceTickers.getBtcUsd() != null) HomeServerSettingFragment.this.arkBTCValue = priceTickers.getBtc().getLast();
+                        if (priceTickers.getBtcEur() != null)
+                            HomeServerSettingFragment.this.bitcoinEURValue = priceTickers.getBtcEur().getLast();
+                        if (priceTickers.getBtcUsd() != null)
+                            HomeServerSettingFragment.this.bitcoinUSDValue = priceTickers.getBtcUsd().getLast();
+                        if (priceTickers.getBtcUsd() != null)
+                            HomeServerSettingFragment.this.arkBTCValue = priceTickers.getBtc().getLast();
 
                         calculateEquivalentInBitcoinUSDandEUR();
                     }), false);
+        }
     }
 
     @Override
@@ -195,9 +199,8 @@ public class HomeServerSettingFragment extends Fragment {
     }
 
     private void loadDelegate() {
-        if (Utils.validateUsername(mServerSetting.getServerName())) {
+        if (Utils.validateUsername(mServerSetting.getServerName()))
             usernameTextview.setText(mServerSetting.getServerName());
-        }
 
         ArkService.getInstance().requestDelegate(mServerSetting.getServerName(), mServerSetting, new RequestListener<Delegate>() {
             @Override
@@ -217,7 +220,7 @@ public class HomeServerSettingFragment extends Fragment {
 
                 loadForging();
                 loadAccount();
-                loadDelegate();
+                //loadDelegate();
             }
 
             @Override
@@ -433,13 +436,14 @@ public class HomeServerSettingFragment extends Fragment {
     private void calculateEquivalentInBitcoinUSDandEUR() {
         if (HomeServerSettingFragment.this.balance > 0 && HomeServerSettingFragment.this.arkBTCValue > 0) {
             double balanceBtcEquivalent = HomeServerSettingFragment.this.balance * HomeServerSettingFragment.this.arkBTCValue;
-
             double balanceUSDEquivalent = -1;
             double balanceEurEquivalent = -1;
 
             if (HomeServerSettingFragment.this.bitcoinUSDValue > 0) {
                 balanceUSDEquivalent = balanceBtcEquivalent * HomeServerSettingFragment.this.bitcoinUSDValue;
-            } else if (HomeServerSettingFragment.this.bitcoinEURValue > 0) {
+            }
+
+            if (HomeServerSettingFragment.this.bitcoinEURValue > 0) {
                 balanceEurEquivalent = balanceBtcEquivalent * HomeServerSettingFragment.this.bitcoinEURValue;
             }
 

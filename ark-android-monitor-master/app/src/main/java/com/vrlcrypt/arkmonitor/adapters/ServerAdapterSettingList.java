@@ -9,6 +9,7 @@ import com.vrlcrypt.arkmonitor.R;
 import com.vrlcrypt.arkmonitor.adapters.callback.ServerSettingListDelegate;
 import com.vrlcrypt.arkmonitor.adapters.viewHolder.ServerSettingViewHolder;
 import com.vrlcrypt.arkmonitor.adapters.viewModel.SettingViewModel;
+import com.vrlcrypt.arkmonitor.models.ServerSetting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,26 @@ public class ServerAdapterSettingList extends RecyclerView.Adapter<ServerSetting
             mDataSource.remove(index);
             notifyItemRemoved(index);
         }
+    }
+
+    public boolean containsIncomplete() {
+        for (SettingViewModel viewModel : mDataSource)
+            if (viewModel.getServerSetting().getServerName() == null
+                    || viewModel.getServerSetting().getServerName().equals("")
+                    || viewModel.getServerSetting().getServerName().equals("New Server"))
+                return true;
+
+        return false;
+    }
+
+    public ServerSetting getIncompleteServerSetting() {
+        for (SettingViewModel viewModel : mDataSource)
+            if (viewModel.getServerSetting().getServerName() == null
+                    || viewModel.getServerSetting().getServerName().equals("")
+                    || viewModel.getServerSetting().getServerName().equals("New Server"))
+                return viewModel.getServerSetting();
+
+        return null;
     }
 
 }
