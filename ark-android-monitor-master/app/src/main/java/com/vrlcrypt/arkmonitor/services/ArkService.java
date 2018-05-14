@@ -406,6 +406,7 @@ public class ArkService {
         }
 
         String urlRequest = replaceURLWithSettings(STATUS_URL, serverSetting);
+        Log.d(ArkService.class.getSimpleName(), "UrlRequest: " + urlRequest);
 
         Request request = new Request.Builder()
                 .url(urlRequest)
@@ -420,6 +421,8 @@ public class ArkService {
             @Override
             public void onResponse(Call call, final Response response) throws IOException {
                 String jsonData = response.body().string();
+                Log.d(ArkService.class.getSimpleName(), "Status: " + jsonData);
+
                 try {
                     JSONObject jsonObject = new JSONObject(jsonData);
 
