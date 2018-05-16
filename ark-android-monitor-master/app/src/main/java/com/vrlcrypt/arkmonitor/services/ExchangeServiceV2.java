@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -40,9 +41,25 @@ public class ExchangeServiceV2 {
         return Observable.fromCallable(() -> {
             Log.d(ExchangeServiceV2.class.getSimpleName(), "Getting price tickers");
 
-            Ticker btcUsd = parseResponse(client.newCall(getBtcUsdRequest()).execute(), false);
-            Ticker btcEur = parseResponse(client.newCall(getBtcEurRequest()).execute(), false);
-            Ticker btc = parseResponse(client.newCall(getBtcRequest()).execute(), true);
+            Ticker btcUsd = null, btcEur = null, btc = null;
+
+            try {
+                btcUsd = parseResponse(client.newCall(getBtcUsdRequest()).execute(), false);
+            } catch (InterruptedIOException ex) {
+                Log.e(ExchangeServiceV2.class.getSimpleName(), "BTCUSD Price Ticker", ex.getCause());
+            }
+
+            try {
+                btcEur = parseResponse(client.newCall(getBtcEurRequest()).execute(), false);
+            } catch (InterruptedIOException ex) {
+                Log.e(ExchangeServiceV2.class.getSimpleName(), "BTCEUR Price Ticker", ex.getCause());
+            }
+
+            try {
+                btc = parseResponse(client.newCall(getBtcRequest()).execute(), true);
+            } catch (InterruptedIOException ex) {
+                Log.e(ExchangeServiceV2.class.getSimpleName(), "BTC Price Ticker", ex.getCause());
+            }
 
             return new PriceTickers(btc, btcUsd, btcEur);
         }).repeatWhen(objectObservable -> Observable.timer(10, TimeUnit.SECONDS))
