@@ -725,6 +725,8 @@ public class ArkService {
 
         String apiUrl = url.replace(IP_ATTR, serverSetting.getIpAddress());
         apiUrl = apiUrl.replace(PORT_ATTR, String.valueOf(serverSetting.getPort()));
+
+        Log.d("SERVERURL", (serverSetting.getSslEnabled() ? HTTPS_PROTOCOL : HTTP_PROTOCOL) + apiUrl);
         return (serverSetting.getSslEnabled() ? HTTPS_PROTOCOL : HTTP_PROTOCOL) + apiUrl;
     }
 
