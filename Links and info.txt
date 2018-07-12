@@ -1,0 +1,15 @@
+https://github.com/ArkEcosystem/explorer/tree/master/src
+https://docs.ark.io/reference#retrieve-a-delegate-1
+
+
+
+
+https://github.com/ArkEcosystem/explorer/blob/master/src/services/forging.js
+
+https://github.com/ArkEcosystem/explorer/blob/master/src/services/delegate.js#L242
+
+
+
+
+
+https://github.com/ArkEcosystem/explorer/blob/master/src/components/monitor/ActiveDelegates.vue
