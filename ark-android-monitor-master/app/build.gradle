@@ -72,5 +72,7 @@ dependencies {
        implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'android.arch.lifecycle:reactivestreams:1+'
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
+    testCompile 'org.json:json:20140107'
+
 
 }

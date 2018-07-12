@@ -6,9 +6,9 @@ public class BlockHeight {
 
     private long height;
 
-    private long id;
+    private String id;
 
-    public BlockHeight(boolean success, long height, long id) {
+    public BlockHeight(boolean success, long height, String id) {
         this.success = success;
         this.height = height;
         this.id = id;
@@ -22,7 +22,7 @@ public class BlockHeight {
         return height;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 

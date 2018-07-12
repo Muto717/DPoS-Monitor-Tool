@@ -1,8 +1,13 @@
 package com.vrlcrypt.arkmonitor.services;
 
+import android.arch.persistence.room.Delete;
+
 import com.google.gson.Gson;
 import com.vrlcrypt.arkmonitor.models.BlockHeight;
+import com.vrlcrypt.arkmonitor.models.Delegate;
 import com.vrlcrypt.arkmonitor.models.ServerSetting;
+
+import org.json.JSONObject;
 
 import java.util.concurrent.Callable;
 
@@ -20,9 +25,9 @@ public class ArkService2 {
 
     private static final String IP_ATTR = "ip";
     private static final String PORT_ATTR = "port";
-    private static final String CUSTOM_API_URL = IP_ATTR + ":" + PORT_ATTR + "/api/";
 
-    private static final String BLOCKS_URL = CUSTOM_API_URL + "blocks";
+    private static final String BLOCKS_URL = "blocks/";
+    private static final String DELEGATE_URL = "delegates/get/";
 
     private static final String HTTP_PROTOCOL = "http://";
     private static final String HTTPS_PROTOCOL = "https://";
@@ -42,14 +47,14 @@ public class ArkService2 {
 
     public Observable<BlockHeight> getBlockHeight(final ServerSetting settings) {
         return Observable
-                .fromCallable(() -> client.newCall(createRequest(BLOCKS_URL, "getHeight", settings)).execute())
+                .fromCallable(() -> client.newCall(createRequest("https://node1.arknet.cloud/api/" + BLOCKS_URL, "getHeight", settings)).execute()) //Todo remove
                 .map(response -> {
                     int code = response.code();
 
                     if (code >= 400 && code <= 499) {                        //Client error
-                        return new BlockHeight(false, -1, -1);
+                        return new BlockHeight(false, -1, "");
                     } else if (code >= 500 && code <= 599) {                        //Server error
-                        return new BlockHeight(false, -1, -1);
+                        return new BlockHeight(false, -1, "");
                     } else {
                         return new Gson().fromJson(response.body().string(), BlockHeight.class);
                     }
@@ -57,25 +62,29 @@ public class ArkService2 {
                 });
     }
 
+    public Observable<Delegate> getDelegate(String username) {
+        return Observable
+                .fromCallable(new Callable<Response>() {
+                    @Override
+                    public Response call() throws Exception {
+                        return client.newCall(createRequest("https://node1.arknet.cloud/api/" + DELEGATE_URL, "?username=" + username, null)).execute();
+                    }
+                }).map(new Function<Response, Delegate>() {
+                    @Override
+                    public Delegate apply(Response response) throws Exception {
+                        return Delegate.fromJson(new JSONObject(response.body().string()).getJSONObject("delegate"));
+                    }
+                });
+    }
+
     private Request createRequest(String url, String endPoint, ServerSetting settings) {
         String urlRequest = url + endPoint;
 
-        urlRequest = replaceURLWithSettings(urlRequest, settings);
+        //urlRequest = replaceURLWithSettings(urlRequest, settings);
 
         return new Request.Builder()
                 .url(urlRequest)
                 .build();
-    }
-
-    private static String replaceURLWithSettings(String url, ServerSetting settings) {
-        if (settings.getServer() != null && !settings.getServer().isCustomServer()) {
-            String apiUrl = url.replace(CUSTOM_API_URL, "");
-            return settings.getServer().getApiAddress() + apiUrl;
-        }
-
-        String apiUrl = url.replace(IP_ATTR, settings.getIpAddress());
-        apiUrl = apiUrl.replace(PORT_ATTR, String.valueOf(settings.getPort()));
-        return (settings.getSslEnabled() ? HTTPS_PROTOCOL : HTTP_PROTOCOL) + apiUrl;
     }
 
 }

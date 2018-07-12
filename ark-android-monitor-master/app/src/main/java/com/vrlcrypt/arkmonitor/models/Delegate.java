@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class Delegate implements Comparable<Delegate> {
+
     private String username;
     private String address;
     private String publicKey;
@@ -18,6 +19,8 @@ public class Delegate implements Comparable<Delegate> {
     private Long rate;
     private Double productivity;
     private Double approval;
+
+    private Block lastBlock;
 
     private static final String TAG = Delegate.class.getSimpleName();
 
@@ -183,4 +186,11 @@ public class Delegate implements Comparable<Delegate> {
         return rate.compareTo(delegate.rate);
     }
 
+    public Block getLastBlock() {
+        return lastBlock;
+    }
+
+    public void setLastBlock(Block lastBlock) {
+        this.lastBlock = lastBlock;
+    }
 }
