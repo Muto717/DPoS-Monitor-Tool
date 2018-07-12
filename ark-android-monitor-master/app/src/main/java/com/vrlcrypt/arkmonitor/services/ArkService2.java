@@ -3,12 +3,16 @@ package com.vrlcrypt.arkmonitor.services;
 import android.arch.persistence.room.Delete;
 
 import com.google.gson.Gson;
+import com.vrlcrypt.arkmonitor.models.Block;
 import com.vrlcrypt.arkmonitor.models.BlockHeight;
 import com.vrlcrypt.arkmonitor.models.Delegate;
 import com.vrlcrypt.arkmonitor.models.ServerSetting;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import io.reactivex.Observable;
@@ -28,6 +32,8 @@ public class ArkService2 {
 
     private static final String BLOCKS_URL = "blocks/";
     private static final String DELEGATE_URL = "delegates/get/";
+    private static final String BLOCK_URL = "blocks";
+
 
     private static final String HTTP_PROTOCOL = "http://";
     private static final String HTTPS_PROTOCOL = "https://";
@@ -62,19 +68,25 @@ public class ArkService2 {
                 });
     }
 
+    public Observable<List<Block>> getBlocks(int amount) {
+        return Observable
+                .fromCallable(() -> client.newCall(createRequest("https://node1.arknet.cloud/api/" + BLOCK_URL, "?height=" + amount, null)).execute())
+                .map(response -> {
+                    JSONArray array = new JSONObject(response.body().string()).getJSONArray("blocks");
+                    List<Block> blocks = new ArrayList<>();
+
+                    for (int i = 0; i < array.length(); i++) {
+                        blocks.add(Block.fromJson(array.getJSONObject(i)));
+                    }
+
+                    return blocks;
+                });
+    }
+
     public Observable<Delegate> getDelegate(String username) {
         return Observable
-                .fromCallable(new Callable<Response>() {
-                    @Override
-                    public Response call() throws Exception {
-                        return client.newCall(createRequest("https://node1.arknet.cloud/api/" + DELEGATE_URL, "?username=" + username, null)).execute();
-                    }
-                }).map(new Function<Response, Delegate>() {
-                    @Override
-                    public Delegate apply(Response response) throws Exception {
-                        return Delegate.fromJson(new JSONObject(response.body().string()).getJSONObject("delegate"));
-                    }
-                });
+                .fromCallable(() -> client.newCall(createRequest("https://node1.arknet.cloud/api/" + DELEGATE_URL, "?username=" + username, null)).execute())
+                .map(response -> Delegate.fromJson(new JSONObject(response.body().string()).getJSONObject("delegate")));
     }
 
     private Request createRequest(String url, String endPoint, ServerSetting settings) {

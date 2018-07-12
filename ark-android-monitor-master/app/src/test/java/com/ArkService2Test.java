@@ -5,6 +5,7 @@ import android.util.Log;
 import com.vrlcrypt.arkmonitor.models.BlockHeight;
 import com.vrlcrypt.arkmonitor.models.Delegate;
 import com.vrlcrypt.arkmonitor.models.ServerSetting;
+import com.vrlcrypt.arkmonitor.services.ArkService;
 import com.vrlcrypt.arkmonitor.services.ArkService2;
 
 import org.junit.Before;
@@ -40,4 +41,11 @@ public class ArkService2Test {
                 );
     }
 
+    @Test
+    public void testGetBlocks() {
+        ArkService2.getInstance().getBlocks(100)
+                .subscribe(
+                        blocks -> System.out.println(blocks.size()),
+                        throwable -> System.out.println(throwable.getMessage())
+                );    }
 }
