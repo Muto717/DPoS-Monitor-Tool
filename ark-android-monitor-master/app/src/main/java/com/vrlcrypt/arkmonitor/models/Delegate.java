@@ -21,6 +21,7 @@ public class Delegate implements Comparable<Delegate> {
     private Double approval;
 
     private Block lastBlock;
+    private long blocksAt;
 
     private static final String TAG = Delegate.class.getSimpleName();
 
@@ -192,5 +193,13 @@ public class Delegate implements Comparable<Delegate> {
 
     public void setLastBlock(Block lastBlock) {
         this.lastBlock = lastBlock;
+    }
+
+    public long getBlocksAt() {
+        return blocksAt;
+    }
+
+    public void setBlocksAt(long blocksAt) {
+        this.blocksAt = blocksAt;
     }
 }

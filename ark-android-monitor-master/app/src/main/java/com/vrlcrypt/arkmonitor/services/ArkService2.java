@@ -70,7 +70,7 @@ public class ArkService2 {
 
     public Observable<List<Block>> getBlocks(int amount) {
         return Observable
-                .fromCallable(() -> client.newCall(createRequest("https://node1.arknet.cloud/api/" + BLOCK_URL, "?height=" + amount, null)).execute())
+                .fromCallable(() -> client.newCall(createRequest("https://node1.arknet.cloud/api/" + BLOCK_URL, "?limit=" + amount, null)).execute())
                 .map(response -> {
                     JSONArray array = new JSONObject(response.body().string()).getJSONArray("blocks");
                     List<Block> blocks = new ArrayList<>();
