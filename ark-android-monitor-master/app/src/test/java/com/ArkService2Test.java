@@ -75,7 +75,7 @@ public class ArkService2Test {
                     status.setLastBlock(delegate.getLastBlock());
                     status.setBlockAt(Status.epochStamp(status.getLastBlock().getTimestamp()));
                     status.setNetworkRound(Status.round(blockHeight.getHeight(), 51));
-                    status.setDelegateRound(Status.round(blockHeight.getHeight(), 51));
+                    status.setDelegateRound(Status.round(status.getLastBlock().getHeight(), 51));
                     status.setAwaitingSlot((int) (status.getNetworkRound() - status.getDelegateRound()));
 
                     return status;
