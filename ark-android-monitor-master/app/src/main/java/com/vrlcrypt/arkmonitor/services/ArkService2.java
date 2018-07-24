@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.vrlcrypt.arkmonitor.models.Block;
 import com.vrlcrypt.arkmonitor.models.BlockHeight;
 import com.vrlcrypt.arkmonitor.models.Delegate;
+import com.vrlcrypt.arkmonitor.models.NextForger;
 import com.vrlcrypt.arkmonitor.models.ServerSetting;
 
 import org.json.JSONArray;
@@ -33,6 +34,7 @@ public class ArkService2 {
     private static final String BLOCKS_URL = "blocks/";
     private static final String DELEGATE_URL = "delegates/get/";
     private static final String BLOCK_URL = "blocks";
+    private static final String NEXT_FORGER_URL = "delegates/getNextForgers";
 
 
     private static final String HTTP_PROTOCOL = "http://";
@@ -87,6 +89,16 @@ public class ArkService2 {
         return Observable
                 .fromCallable(() -> client.newCall(createRequest("https://node1.arknet.cloud/api/" + DELEGATE_URL, "?username=" + username, null)).execute())
                 .map(response -> Delegate.fromJson(new JSONObject(response.body().string()).getJSONObject("delegate")));
+    }
+
+    //TODO               getNextForgers                   https://node1.arknet.cloud/api/delegates/getNextForgers
+    //             Delegate.isRoundDelegate           contains my delegate public key then is round delegate          forging time is delegateIndex (index of public key in forgers array * 8)
+    //              https://github.com/ArkEcosystem/explorer/blob/master/src/services/delegate.js#L242
+
+    public Observable<NextForger> getNextForgers() {
+        return Observable
+                .fromCallable(() -> client.newCall(createRequest("https://node1.arknet.cloud/api/" + NEXT_FORGER_URL, "", null)).execute())
+                .map(response -> NextForger.fromJson(response.body().string()));
     }
 
     private Request createRequest(String url, String endPoint, ServerSetting settings) {

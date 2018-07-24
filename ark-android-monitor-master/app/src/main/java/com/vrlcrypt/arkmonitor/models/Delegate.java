@@ -23,6 +23,10 @@ public class Delegate implements Comparable<Delegate> {
     private Block lastBlock;
     private long blocksAt;
 
+    private boolean isRoundDelegate;
+
+    private long forgingTime;
+
     private static final String TAG = Delegate.class.getSimpleName();
 
     public String getUsername() {
@@ -201,5 +205,21 @@ public class Delegate implements Comparable<Delegate> {
 
     public void setBlocksAt(long blocksAt) {
         this.blocksAt = blocksAt;
+    }
+
+    public boolean isRoundDelegate() {
+        return isRoundDelegate;
+    }
+
+    public void setRoundDelegate(boolean roundDelegate) {
+        isRoundDelegate = roundDelegate;
+    }
+
+    public long getForgingTime() {
+        return forgingTime;
+    }
+
+    public void setForgingTime(long forgingTime) {
+        this.forgingTime = forgingTime;
     }
 }
