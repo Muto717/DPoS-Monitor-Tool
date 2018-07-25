@@ -27,6 +27,8 @@ public class Delegate implements Comparable<Delegate> {
 
     private long forgingTime;
 
+    private Status status;
+
     private static final String TAG = Delegate.class.getSimpleName();
 
     public String getUsername() {
@@ -221,5 +223,13 @@ public class Delegate implements Comparable<Delegate> {
 
     public void setForgingTime(long forgingTime) {
         this.forgingTime = forgingTime;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }

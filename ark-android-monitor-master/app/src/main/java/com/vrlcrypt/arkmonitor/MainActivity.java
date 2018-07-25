@@ -23,6 +23,7 @@ import com.vrlcrypt.arkmonitor.fragments.voters.VoterContainerFragment;
 import com.vrlcrypt.arkmonitor.fragments.votes.VotesContainerFragment;
 import com.vrlcrypt.arkmonitor.fragments.transactions.TransactionsContainerFragment;
 import com.vrlcrypt.arkmonitor.scheduler.ForgingAlarmReceiver;
+import com.vrlcrypt.arkmonitor.services.DelegateStatusPool;
 import com.vrlcrypt.arkmonitor.services.ExchangeServiceV2;
 import com.vrlcrypt.arkmonitor.utils.Utils;
 import com.wang.avi.AVLoadingIndicatorView;
@@ -58,6 +59,11 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         onNavigationItemSelected(navigationView.getMenu().getItem(NavItem.HOME.getIndex()));
+
+        DelegateStatusPool.getInstance().insertDelegate("arkpool");
+        DelegateStatusPool.getInstance().insertDelegate("biz_classic");
+        DelegateStatusPool.getInstance().insertDelegate("bioly");
+        DelegateStatusPool.getInstance().insertDelegate("arkade_delegate");
     }
 
     public void showLoadingIndicatorView() {

@@ -72,7 +72,7 @@ public class ArkService2 {
 
     public Observable<List<Block>> getBlocks(int amount) {
         return Observable
-                .fromCallable(() -> client.newCall(createRequest("https://node1.arknet.cloud/api/" + BLOCK_URL, "?limit=" + amount, null)).execute())
+                .fromCallable(() -> client.newCall(createRequest("https://node1.arknet.cloud/api/" + BLOCK_URL, "?orderBy=height:desc&limit=" + amount, null)).execute())
                 .map(response -> {
                     JSONArray array = new JSONObject(response.body().string()).getJSONArray("blocks");
                     List<Block> blocks = new ArrayList<>();
@@ -91,13 +91,9 @@ public class ArkService2 {
                 .map(response -> Delegate.fromJson(new JSONObject(response.body().string()).getJSONObject("delegate")));
     }
 
-    //TODO               getNextForgers                   https://node1.arknet.cloud/api/delegates/getNextForgers
-    //             Delegate.isRoundDelegate           contains my delegate public key then is round delegate          forging time is delegateIndex (index of public key in forgers array * 8)
-    //              https://github.com/ArkEcosystem/explorer/blob/master/src/services/delegate.js#L242
-
     public Observable<NextForger> getNextForgers() {
         return Observable
-                .fromCallable(() -> client.newCall(createRequest("https://node1.arknet.cloud/api/" + NEXT_FORGER_URL, "", null)).execute())
+                .fromCallable(() -> client.newCall(createRequest("https://node1.arknet.cloud/api/" + NEXT_FORGER_URL, "?limit=51", null)).execute())
                 .map(response -> NextForger.fromJson(response.body().string()));
     }
 
