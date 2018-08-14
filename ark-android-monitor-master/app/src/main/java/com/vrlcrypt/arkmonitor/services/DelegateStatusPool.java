@@ -7,6 +7,7 @@ import com.vrlcrypt.arkmonitor.models.Block;
 import com.vrlcrypt.arkmonitor.models.BlockHeight;
 import com.vrlcrypt.arkmonitor.models.Delegate;
 import com.vrlcrypt.arkmonitor.models.NextForger;
+import com.vrlcrypt.arkmonitor.models.ServerSetting;
 import com.vrlcrypt.arkmonitor.models.Status;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class DelegateStatusPool implements Consumer<Long> {
 
     private static DelegateStatusPool sInstance;
 
-    private List<String> mDelegates;
+    private List<ServerSetting> mDelegates;
 
     private CompositeDisposable mDisposables;
 
@@ -51,7 +52,7 @@ public class DelegateStatusPool implements Consumer<Long> {
         return sInstance;
     }
 
-    public void insertDelegate(String delegate) {
+    public void insertDelegate(ServerSetting delegate) {
         mDelegates.add(delegate);
     }
 
@@ -62,8 +63,8 @@ public class DelegateStatusPool implements Consumer<Long> {
         if (!mDelegates.isEmpty()) {
             ArkService2 service = ArkService2.getInstance();
 
-            for (String delegateName : mDelegates) {
-                mDisposables.add(Observable.zip(service.getDelegate(delegateName), service.getBlocks(100), service.getNextForgers(), service.getBlockHeight(null),
+            for (ServerSetting serverSetting : mDelegates) {
+                mDisposables.add(Observable.zip(service.getDelegate(serverSetting), service.getBlocks(serverSetting,100), service.getNextForgers(serverSetting), service.getBlockHeight(serverSetting),
                         (delegate, blocks, nextForger, blockHeight) -> {
                             for (Block block : blocks) {
                                 if (block.getGeneratorPublicKey().equals(delegate.getPublicKey())) {
@@ -94,7 +95,7 @@ public class DelegateStatusPool implements Consumer<Long> {
                         .subscribe(
                                 delegate -> {
                                     int status = getStatus(delegate);
-                                    mAwaitingPublish.add(new Pair<>(delegateName, status));
+                                    mAwaitingPublish.add(new Pair<>(serverSetting.getServerName(), status));
 
                                     if (mAwaitingPublish.size() == mDelegates.size()) { //Publish and clear
                                         mStatusPublisher.onNext(mAwaitingPublish);
@@ -103,7 +104,7 @@ public class DelegateStatusPool implements Consumer<Long> {
                                 },
                                 throwable -> {
                                     int status = -1;
-                                    mAwaitingPublish.add(new Pair<>(delegateName, status));
+                                    mAwaitingPublish.add(new Pair<>(serverSetting.getServerName(), status));
 
                                     if (mAwaitingPublish.size() == mDelegates.size()) { //Publish and clear
                                         mStatusPublisher.onNext(mAwaitingPublish);

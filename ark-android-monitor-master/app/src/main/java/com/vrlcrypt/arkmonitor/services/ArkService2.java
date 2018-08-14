@@ -1,6 +1,7 @@
 package com.vrlcrypt.arkmonitor.services;
 
 import android.arch.persistence.room.Delete;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.vrlcrypt.arkmonitor.models.Block;
@@ -25,6 +26,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class ArkService2 {
+
+    public static final String TAG = ArkService2.class.getSimpleName();
 
     private static ArkService2 sInstance = null;
 
@@ -55,8 +58,9 @@ public class ArkService2 {
 
     public Observable<BlockHeight> getBlockHeight(final ServerSetting settings) {
         return Observable
-                .fromCallable(() -> client.newCall(createRequest("https://node1.arknet.cloud/api/" + BLOCKS_URL, "getHeight", settings)).execute()) //Todo remove
+                .fromCallable(() -> client.newCall(createRequest((settings.getServer().isCustomServer() ? "http://" + settings.getIpAddress() + ":" + settings.getPortAsString() + "/" : "https://" + settings.getServer().getApiAddress()) + "/api/" + BLOCKS_URL, "getHeight", settings)).execute()) //Todo remove
                 .map(response -> {
+                    Log.d(TAG, "getBlockHeight: " + response);
                     int code = response.code();
 
                     if (code >= 400 && code <= 499) {                        //Client error
@@ -70,10 +74,12 @@ public class ArkService2 {
                 });
     }
 
-    public Observable<List<Block>> getBlocks(int amount) {
+    public Observable<List<Block>> getBlocks(final ServerSetting settings, int amount) {
         return Observable
-                .fromCallable(() -> client.newCall(createRequest("https://node1.arknet.cloud/api/" + BLOCK_URL, "?orderBy=height:desc&limit=" + amount, null)).execute())
+                .fromCallable(() -> client.newCall(createRequest((settings.getServer().isCustomServer() ? "http://" + settings.getIpAddress() + ":" + settings.getPortAsString() + "/" : "https://" + settings.getServer().getApiAddress()) +  BLOCK_URL, "?orderBy=height:desc&limit=" + amount, null)).execute())
                 .map(response -> {
+                    Log.d(TAG, "getBlocks: " + response);
+
                     JSONArray array = new JSONObject(response.body().string()).getJSONArray("blocks");
                     List<Block> blocks = new ArrayList<>();
 
@@ -85,23 +91,26 @@ public class ArkService2 {
                 });
     }
 
-    public Observable<Delegate> getDelegate(String username) {
+    public Observable<Delegate> getDelegate(final ServerSetting settings) {
         return Observable
-                .fromCallable(() -> client.newCall(createRequest("https://node1.arknet.cloud/api/" + DELEGATE_URL, "?username=" + username, null)).execute())
-                .map(response -> Delegate.fromJson(new JSONObject(response.body().string()).getJSONObject("delegate")));
+                .fromCallable(() -> client.newCall(createRequest((settings.getServer().isCustomServer() ? "http://" + settings.getIpAddress() + ":" + settings.getPortAsString() + "/" : "https://" + settings.getServer().getApiAddress()) +  DELEGATE_URL, "?username=" + settings.getServerName(), null)).execute())
+                .map(response -> {
+                    Log.d(TAG, "getDelegate: " + response);
+                    return Delegate.fromJson(new JSONObject(response.body().string()).getJSONObject("delegate"));
+                });
     }
 
-    public Observable<NextForger> getNextForgers() {
+    public Observable<NextForger> getNextForgers(final ServerSetting settings) {
         return Observable
-                .fromCallable(() -> client.newCall(createRequest("https://node1.arknet.cloud/api/" + NEXT_FORGER_URL, "?limit=51", null)).execute())
-                .map(response -> NextForger.fromJson(response.body().string()));
+                .fromCallable(() -> client.newCall(createRequest((settings.getServer().isCustomServer() ? "http://" + settings.getIpAddress() + ":" + settings.getPortAsString() + "/" : "https://" + settings.getServer().getApiAddress()) +  NEXT_FORGER_URL, "?limit=51", null)).execute())
+                .map(response -> {
+                    Log.d(TAG, "getNextForgers: " + response);
+                    return NextForger.fromJson(response.body().string());
+                });
     }
 
     private Request createRequest(String url, String endPoint, ServerSetting settings) {
         String urlRequest = url + endPoint;
-
-        //urlRequest = replaceURLWithSettings(urlRequest, settings);
-
         return new Request.Builder()
                 .url(urlRequest)
                 .build();

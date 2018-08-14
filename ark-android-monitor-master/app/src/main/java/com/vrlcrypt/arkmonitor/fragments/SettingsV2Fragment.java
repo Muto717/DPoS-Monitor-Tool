@@ -2,7 +2,6 @@ package com.vrlcrypt.arkmonitor.fragments;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,8 +11,8 @@ import android.view.ViewGroup;
 import com.thorcom.testapp.subscription.SubscriptionManager;
 import com.vrlcrypt.arkmonitor.MainActivity;
 import com.vrlcrypt.arkmonitor.R;
-import com.vrlcrypt.arkmonitor.adapters.ServerAdapterSettingList;
-import com.vrlcrypt.arkmonitor.adapters.viewModel.SettingViewModel;
+import com.vrlcrypt.arkmonitor.adapters.MiniServerAdapter;
+import com.vrlcrypt.arkmonitor.adapters.viewModel.ServerViewModel;
 import com.vrlcrypt.arkmonitor.databinding.FragmentSettingsBinding;
 import com.vrlcrypt.arkmonitor.models.ServerSetting;
 import com.vrlcrypt.arkmonitor.persistance.SettingsDatabase;
@@ -22,12 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 
 public class SettingsV2Fragment extends Fragment implements OnClickListener {
 
-    private ServerAdapterSettingList mSettingAdapter;
+    private MiniServerAdapter mServerAdapter;
+
     private FragmentSettingsBinding mBinding;
 
     @Override
@@ -35,9 +34,9 @@ public class SettingsV2Fragment extends Fragment implements OnClickListener {
                              Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false);
 
-        mSettingAdapter = new ServerAdapterSettingList();
+        mServerAdapter = new MiniServerAdapter();
 
-        mBinding.listSetting.setAdapter(mSettingAdapter);
+        mBinding.listSetting.setAdapter(mServerAdapter);
         mBinding.setOnClick(this);
 
         loadServers();
@@ -50,45 +49,18 @@ public class SettingsV2Fragment extends Fragment implements OnClickListener {
                 SettingsV2Fragment.class.getSimpleName(),
                 SettingsDatabase.getInstance(getContext()).settingDao().getSettings().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                         .map(serverSettings -> {
-                            List<SettingViewModel> toAdd = new ArrayList<>();
+                            List<ServerViewModel> toAdd = new ArrayList<>();
 
                             for (ServerSetting serverSetting : serverSettings) {
-                                boolean found = false;
-
-                                for (SettingViewModel viewModel : mSettingAdapter.getDataSource())
-                                    if (viewModel.getServerSetting().getServerName() != null)
-                                        if (viewModel.getServerSetting().getServerName().equals(serverSetting.getServerName()))
-                                            found = true;
-
-                                if (!found)
-                                    toAdd.add(new SettingViewModel(getActivity().getApplication(), serverSetting));
+                                toAdd.add(new ServerViewModel(serverSetting));
                             }
 
                             return toAdd;
                         })
                         .subscribe(settings -> {
-                            for (SettingViewModel viewModel : settings)
-                                mSettingAdapter.insertNew(viewModel);
-
-                            if (mSettingAdapter.getDataSource().isEmpty())
-                                mBinding.txtNoServers.setVisibility(View.VISIBLE);
-                            else {
-                                mBinding.txtNoServers.setVisibility(View.GONE);
-                                mBinding.listSetting.scrollToPosition(0);
-                            }
+                            mServerAdapter.setData(settings);
                         }),
                 true);
-    }
-
-    @Override
-    public void onPause() {
-        ServerSetting incompleteServerSetting = mSettingAdapter.getIncompleteServerSetting();
-
-        if (mSettingAdapter.containsIncomplete() && incompleteServerSetting != null)
-            SettingsDatabase.getInstance(getContext()).delete(incompleteServerSetting);
-
-        super.onPause();
-
     }
 
     @Override

@@ -29,7 +29,7 @@ public class StatusService extends BindableService {
     private Consumer<List<ServerSetting>> mServerConsumer = serverSetting -> {
         for (ServerSetting setting : serverSetting) {
             if (!statusPool.containsDelegate(setting.getServerName())) {
-                statusPool.insertDelegate(setting.getServerName());
+                statusPool.insertDelegate(setting);
             }
         }
     };

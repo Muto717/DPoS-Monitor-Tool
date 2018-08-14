@@ -68,7 +68,7 @@
                     android:hint="@string/empty"
                     android:enabled="false"
                     android:imeOptions="flagNoExtractUi"
-                    android:text="@{model.serverSetting.serverName}"
+                    android:text="@{model.mServer.serverName}"
                     android:textAlignment="textEnd"
                     android:textSize="@dimen/default_font_size" />
             </TableRow>
@@ -221,7 +221,7 @@
                     android:enabled="false"
                     android:hint="@string/ip_address_hint"
                     android:imeOptions="flagNoExtractUi"
-                    android:text="@{model.serverSetting.ipAddress}"
+                    android:text="@{model.mServer.ipAddress}"
                     android:textAlignment="textEnd"
                     android:textSize="@dimen/default_font_size" />
             </TableRow>
@@ -266,7 +266,7 @@
                     android:inputType="number"
                     android:maxLength="20"
                     android:maxLines="1"
-                    android:text="@{model.serverSetting.portAsString}"
+                    android:text="@{model.mServer.portAsString}"
                     android:textAlignment="textEnd"
                     android:textSize="@dimen/default_font_size" />
             </TableRow>
@@ -306,7 +306,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:checked="@{model.isCustomServer ? model.serverSetting.sslEnabled : false}"
+                    android:checked="@{model.isCustomServer ? model.mServer.sslEnabled : false}"
                     android:enabled="false"
                     android:textAlignment="textEnd" />
             </TableRow>

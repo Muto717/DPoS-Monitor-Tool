@@ -6,6 +6,7 @@ import com.vrlcrypt.arkmonitor.models.Block;
 import com.vrlcrypt.arkmonitor.models.BlockHeight;
 import com.vrlcrypt.arkmonitor.models.Delegate;
 import com.vrlcrypt.arkmonitor.models.NextForger;
+import com.vrlcrypt.arkmonitor.models.Server;
 import com.vrlcrypt.arkmonitor.models.ServerSetting;
 import com.vrlcrypt.arkmonitor.models.Status;
 import com.vrlcrypt.arkmonitor.services.ArkService;
@@ -29,8 +30,10 @@ public class ArkService2Test {
     @Before
     public void before() {
         settings = new ServerSetting();
-        settings.setIpAddress("https://node1.arknet.cloud/api/");
-        settings.setPort(-1);
+        settings.setServerName("pieface");
+        settings.setServer(Server.custom);
+        settings.setIpAddress("80.211.102.41");
+        settings.setPort(4100);
     }
 
     /*@Test
@@ -70,7 +73,7 @@ public class ArkService2Test {
     @Test
     public void testTogether() {
         Observable.zip(
-                ArkService2.getInstance().getDelegate("pieface"), ArkService2.getInstance().getBlockHeight(settings), ArkService2.getInstance().getBlocks(100), ArkService2.getInstance().getNextForgers(),
+                ArkService2.getInstance().getDelegate(settings), ArkService2.getInstance().getBlockHeight(settings), ArkService2.getInstance().getBlocks(settings, 100), ArkService2.getInstance().getNextForgers(settings),
                 (delegate, blockHeight, blocks, nextForger) -> {
                     for (Block block : blocks) {
                         if (block.getGeneratorPublicKey().equals(delegate.getPublicKey())) {

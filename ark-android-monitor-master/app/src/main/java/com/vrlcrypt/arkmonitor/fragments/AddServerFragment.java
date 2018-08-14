@@ -1,10 +1,7 @@
 package com.vrlcrypt.arkmonitor.fragments;
 
 import android.app.AlarmManager;
-import android.databinding.DataBindingUtil;
-import android.databinding.ViewDataBinding;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,24 +11,12 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.Spinner;
 
-import com.thorcom.testapp.subscription.SubscriptionManager;
 import com.vrlcrypt.arkmonitor.MainActivity;
 import com.vrlcrypt.arkmonitor.R;
-import com.vrlcrypt.arkmonitor.ViewUtil;
-import com.vrlcrypt.arkmonitor.adapters.ServerAdapterSettingList;
-import com.vrlcrypt.arkmonitor.adapters.viewModel.SettingViewModel;
-import com.vrlcrypt.arkmonitor.databinding.FragmentSettingsBinding;
 import com.vrlcrypt.arkmonitor.models.Server;
 import com.vrlcrypt.arkmonitor.models.ServerSetting;
 import com.vrlcrypt.arkmonitor.persistance.SettingsDatabase;
 import com.vrlcrypt.arkmonitor.utils.ViewUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Action;
-import io.reactivex.schedulers.Schedulers;
 
 public class AddServerFragment extends Fragment implements OnClickListener {
 
@@ -61,7 +46,7 @@ public class AddServerFragment extends Fragment implements OnClickListener {
                 serverSetting.setServerName(ViewUtils.getEditTextValue(getView(), R.id.fld_server_name, ""));
                 serverSetting.setArkAddress(ViewUtils.getEditTextValue(getView(), R.id.fld_address, ""));
                 serverSetting.setPublicKey(ViewUtils.getEditTextValue(getView(), R.id.fld_public_key, ""));
-                serverSetting.setIpAddress(ViewUtils.getEditTextValue(getView(), R.id.fld_public_key, "0.0.0.0"));
+                serverSetting.setIpAddress(ViewUtils.getEditTextValue(getView(), R.id.ip_address, "0.0.0.0"));
                 serverSetting.setPort(Integer.valueOf(ViewUtils.getEditTextValue(getView(), R.id.port, "4001")));
                 serverSetting.setSslEnabled(((CheckBox) getView().findViewById(R.id.ssl_enabled)).isChecked());
                 serverSetting.setServer(Server.fromId(((Spinner) getView().findViewById(R.id.servers)).getSelectedItemPosition()));

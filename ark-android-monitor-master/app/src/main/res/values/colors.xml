@@ -4,4 +4,11 @@
     <color name="colorPrimaryDark">#1d8eba</color>
     <color name="colorAccent">#48B0D8</color>
     <color name="lineColor">#BDBDBD</color>
+
+    <color name="forging">#46b02e</color>
+    <color name="missing">#f6993f</color>
+    <color name="awaitingslot">#838a9b</color>
+    <color name="missedinround">#f6993f</color>
+    <color name="notforging">#ef192d</color>
+
 </resources>
