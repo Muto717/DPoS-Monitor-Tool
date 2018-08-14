@@ -13,7 +13,7 @@ public class ServerViewModel extends ViewModel {
     }
 
     public String getAddress( ) {
-        return (mServer.getServer().isCustomServer() ? "http://" + mServer.getIpAddress() + ":" + mServer.getPortAsString() : "https://" + mServer.getServer().getApiAddress());
+        return (mServer.getServer().isCustomServer() ? "http://" + mServer.getIpAddress() + ":" + mServer.getPortAsString() : mServer.getServer().getApiAddress());
     }
 
     public String getDelegateName() {
