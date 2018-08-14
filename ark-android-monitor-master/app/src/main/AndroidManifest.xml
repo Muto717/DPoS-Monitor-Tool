@@ -43,6 +43,8 @@
         </receiver>
 
         <service android:name=".scheduler.ForgingSchedulingService" />
+        <service android:name=".StatusService" />
+
     </application>
 
 </manifest>

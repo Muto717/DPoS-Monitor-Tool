@@ -1,6 +1,7 @@
 package com.vrlcrypt.arkmonitor.services;
 
 import android.util.Log;
+import android.util.Pair;
 
 import com.vrlcrypt.arkmonitor.models.Block;
 import com.vrlcrypt.arkmonitor.models.BlockHeight;
@@ -18,6 +19,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function4;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 
 public class DelegateStatusPool implements Consumer<Long> {
 
@@ -30,6 +32,10 @@ public class DelegateStatusPool implements Consumer<Long> {
     private List<String> mDelegates;
 
     private CompositeDisposable mDisposables;
+
+    public PublishSubject<List<Pair<String, Integer>>> mStatusPublisher = PublishSubject.create();
+
+    private List<Pair<String, Integer>> mAwaitingPublish = new ArrayList<>();
 
     public DelegateStatusPool() {
         this.mDelegates = new ArrayList<>();
@@ -86,8 +92,24 @@ public class DelegateStatusPool implements Consumer<Long> {
                             return delegate;
                         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
-                                this::getStatus,
-                                throwable -> Log.e(TAG, "Exception for delegate: " + delegateName, throwable)
+                                delegate -> {
+                                    int status = getStatus(delegate);
+                                    mAwaitingPublish.add(new Pair<>(delegateName, status));
+
+                                    if (mAwaitingPublish.size() == mDelegates.size()) { //Publish and clear
+                                        mStatusPublisher.onNext(mAwaitingPublish);
+                                        mAwaitingPublish.clear();
+                                    }
+                                },
+                                throwable -> {
+                                    int status = -1;
+                                    mAwaitingPublish.add(new Pair<>(delegateName, status));
+
+                                    if (mAwaitingPublish.size() == mDelegates.size()) { //Publish and clear
+                                        mStatusPublisher.onNext(mAwaitingPublish);
+                                        mAwaitingPublish.clear();
+                                    }
+                                }
                         ));
             }
 
@@ -113,6 +135,14 @@ public class DelegateStatusPool implements Consumer<Long> {
             Log.d(TAG, delegate.getUsername() + " : Not Forging");
             return Status.NOT_FORGING;
         }
+    }
+
+    public boolean containsDelegate (String delegateName) {
+        return mDelegates.contains(delegateName);
+    }
+
+    public int getDelegateCount () {
+        return mDelegates.size();
     }
 
 }

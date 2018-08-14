@@ -1,5 +1,6 @@
 package com.vrlcrypt.arkmonitor;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -41,6 +42,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        startService(new Intent(this, StatusService.class));
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -59,11 +63,6 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         onNavigationItemSelected(navigationView.getMenu().getItem(NavItem.HOME.getIndex()));
-
-        DelegateStatusPool.getInstance().insertDelegate("arkpool");
-        DelegateStatusPool.getInstance().insertDelegate("biz_classic");
-        DelegateStatusPool.getInstance().insertDelegate("bioly");
-        DelegateStatusPool.getInstance().insertDelegate("arkade_delegate");
     }
 
     public void showLoadingIndicatorView() {

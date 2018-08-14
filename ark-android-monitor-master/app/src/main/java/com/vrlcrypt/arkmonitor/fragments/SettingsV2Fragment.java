@@ -10,6 +10,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
 import com.thorcom.testapp.subscription.SubscriptionManager;
+import com.vrlcrypt.arkmonitor.MainActivity;
 import com.vrlcrypt.arkmonitor.R;
 import com.vrlcrypt.arkmonitor.adapters.ServerAdapterSettingList;
 import com.vrlcrypt.arkmonitor.adapters.viewModel.SettingViewModel;
@@ -102,14 +103,7 @@ public class SettingsV2Fragment extends Fragment implements OnClickListener {
 
         switch (v.getId()) {
             case R.id.btn_add_new_server: {
-
-                if (!mSettingAdapter.containsIncomplete())
-                    SettingsDatabase.getInstance(getContext()).insert(new ServerSetting())
-                            .doOnComplete(() -> mBinding.listSetting.scrollToPosition(0))
-                            .subscribe();
-                else
-                    Snackbar.make(v, "You already have an incomplete server spec", Snackbar.LENGTH_LONG).show();
-
+                ((MainActivity) getActivity()).showFragment(new AddServerFragment());
                 break;
             }
         }

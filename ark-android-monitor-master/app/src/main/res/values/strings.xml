@@ -33,7 +33,7 @@
     <string name="port">Port</string>
     <string name="port_hint">4001</string>
     <string name="port_message">Please enter a valid port</string>
-    <string name="ssl_enabled">SSL enabled?</string>
+    <string name="ssl_enabled">SSL enabled</string>
 
     <string name="notification_interval">Notification interval</string>
     <string-array name="notification_interval_types">

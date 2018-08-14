@@ -188,12 +188,14 @@ public class HomeServerSettingFragment extends Fragment {
 
                 final CharSequence timeAgo = (block != null && block.getTimestamp() > 0) ? Utils.getTimeAgo(block.getTimestamp()) : getString(R.string.not_forging);
 
-                getActivity().runOnUiThread(() -> {
-                    hideLoadingIndicatorView();
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        hideLoadingIndicatorView();
 
-                    mSwipeRefreshLayout.setRefreshing(false);
-                    lastBlockForgedTextView.setText(timeAgo);
-                });
+                        mSwipeRefreshLayout.setRefreshing(false);
+                        lastBlockForgedTextView.setText(timeAgo);
+                    });
+                }
             }
         });
     }
