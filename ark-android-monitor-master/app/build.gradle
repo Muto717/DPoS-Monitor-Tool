@@ -74,5 +74,4 @@ dependencies {
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
     testCompile 'org.json:json:20140107'
 
-
 }

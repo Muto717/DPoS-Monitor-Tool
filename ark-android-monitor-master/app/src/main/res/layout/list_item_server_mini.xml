@@ -2,9 +2,15 @@
 <layout>
 
     <data>
+
         <variable
             name="viewModel"
-            type="com.vrlcrypt.arkmonitor.adapters.viewModel.ServerViewModel"/>
+            type="com.vrlcrypt.arkmonitor.adapters.viewModel.ServerViewModel" />
+
+        <import type="com.vrlcrypt.arkmonitor.models.Status" />
+
+        <import type="android.databinding.adapters.Converters" />
+
     </data>
 
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -21,9 +27,9 @@
             android:id="@+id/txt_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{viewModel.address}"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:text="@{viewModel.address}"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:text="http://192.168.1.1:4100" />
 
@@ -31,16 +37,16 @@
             android:id="@+id/txt_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{viewModel.delegateName}"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:text="@{viewModel.delegateName}"
             tools:text="pieface" />
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
-            android:src="@android:drawable/ic_menu_more"
+            android:src="@drawable/ic_overflow"
             android:tint="@android:color/black"
             app:layout_constraintRight_toRightOf="parent" />
 
@@ -48,7 +54,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="@drawable/circle"
-            android:backgroundTint="@color/forging"
+            app:colorTint="@{viewModel.currentStatus}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent" />
 

@@ -28,7 +28,7 @@ public class StatusService extends BindableService {
 
     private Consumer<List<ServerSetting>> mServerConsumer = serverSetting -> {
         for (ServerSetting setting : serverSetting) {
-            if (!statusPool.containsDelegate(setting.getServerName())) {
+            if (!statusPool.containsDelegate(setting)) {
                 statusPool.insertDelegate(setting);
             }
         }
@@ -47,7 +47,7 @@ public class StatusService extends BindableService {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(mServerConsumer);
 
-        statusPool.mStatusPublisher.subscribe(pairs -> startForeground(NOTIFICATION_ID, StatusServiceNotification.getNotification(getApplicationContext(), pairs)));
+        //statusPool.mStatusPublisher.subscribe(pairs -> startForeground(NOTIFICATION_ID, StatusServiceNotification.getNotification(getApplicationContext(), pairs)));
     }
 
 }

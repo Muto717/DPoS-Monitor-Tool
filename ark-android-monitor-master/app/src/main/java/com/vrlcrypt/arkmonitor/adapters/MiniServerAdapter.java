@@ -2,6 +2,7 @@ package com.vrlcrypt.arkmonitor.adapters;
 
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -40,6 +41,14 @@ public class MiniServerAdapter extends RecyclerView.Adapter<ServerViewHolder> {
     public void setData(List<ServerViewModel> dataSource) {
         this.mDataSource = dataSource;
         notifyDataSetChanged();
+    }
+
+    public void updateStatus(Pair<Integer, Integer> status) {
+        for (ServerViewModel viewModel : mDataSource) {
+            if (status.first.equals(viewModel.getServerUID())) {
+                viewModel.setCurrentStatus(status.second);
+            }
+        }
     }
 
 }

@@ -3,6 +3,7 @@ package com.vrlcrypt.arkmonitor.fragments;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -16,18 +17,23 @@ import com.vrlcrypt.arkmonitor.adapters.viewModel.ServerViewModel;
 import com.vrlcrypt.arkmonitor.databinding.FragmentSettingsBinding;
 import com.vrlcrypt.arkmonitor.models.ServerSetting;
 import com.vrlcrypt.arkmonitor.persistance.SettingsDatabase;
+import com.vrlcrypt.arkmonitor.services.DelegateStatusPool;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-public class SettingsV2Fragment extends Fragment implements OnClickListener {
+public class SettingsV2Fragment extends Fragment implements OnClickListener, Consumer<List<Pair<Integer, Integer>>> {
 
     private MiniServerAdapter mServerAdapter;
 
     private FragmentSettingsBinding mBinding;
+
+    private Disposable mStatusPoolDisposable;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -44,6 +50,19 @@ public class SettingsV2Fragment extends Fragment implements OnClickListener {
         return mBinding.getRoot();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        mStatusPoolDisposable = DelegateStatusPool.getInstance().mStatusPublisher.subscribe(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mStatusPoolDisposable.dispose();
+    }
+
     private void loadServers() {
         SubscriptionManager.getInstance().putSubscription(
                 SettingsV2Fragment.class.getSimpleName(),
@@ -58,7 +77,10 @@ public class SettingsV2Fragment extends Fragment implements OnClickListener {
                             return toAdd;
                         })
                         .subscribe(settings -> {
-                            mServerAdapter.setData(settings);
+                            if (!settings.isEmpty()) {
+                                getView().findViewById(R.id.txt_no_servers).setVisibility(View.GONE);
+                                mServerAdapter.setData(settings);
+                            }
                         }),
                 true);
     }
@@ -80,6 +102,12 @@ public class SettingsV2Fragment extends Fragment implements OnClickListener {
             }
         }
 
+    }
+
+    @Override
+    public void accept(List<Pair<Integer, Integer>> pairs) {
+        for (Pair pair : pairs)
+            mServerAdapter.updateStatus(pair);
     }
 
 }

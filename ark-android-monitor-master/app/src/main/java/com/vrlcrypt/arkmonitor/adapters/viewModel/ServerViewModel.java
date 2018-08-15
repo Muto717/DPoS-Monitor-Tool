@@ -1,6 +1,7 @@
 package com.vrlcrypt.arkmonitor.adapters.viewModel;
 
 import android.arch.lifecycle.ViewModel;
+import android.databinding.ObservableField;
 
 import com.vrlcrypt.arkmonitor.models.ServerSetting;
 
@@ -8,8 +9,11 @@ public class ServerViewModel extends ViewModel {
 
     private ServerSetting mServer;
 
+    public ObservableField<Integer> currentStatus;
+
     public ServerViewModel(ServerSetting mServer) {
         this.mServer = mServer;
+        currentStatus = new ObservableField<>(-1);
     }
 
     public String getAddress( ) {
@@ -18,6 +22,14 @@ public class ServerViewModel extends ViewModel {
 
     public String getDelegateName() {
         return mServer.getServerName();
+    }
+
+    public int getServerUID() {
+        return mServer.getUId();
+    }
+
+    public void setCurrentStatus(int status) {
+        currentStatus.set(status);
     }
 
 }

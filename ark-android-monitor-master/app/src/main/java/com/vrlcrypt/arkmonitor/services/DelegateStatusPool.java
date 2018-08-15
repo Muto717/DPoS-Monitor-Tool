@@ -34,9 +34,13 @@ public class DelegateStatusPool implements Consumer<Long> {
 
     private CompositeDisposable mDisposables;
 
-    public PublishSubject<List<Pair<String, Integer>>> mStatusPublisher = PublishSubject.create();
+    private boolean mCurrentRunComplete = false;
 
-    private List<Pair<String, Integer>> mAwaitingPublish = new ArrayList<>();
+    public PublishSubject<List<Pair<Integer, Integer>>> mStatusPublisher = PublishSubject.create();
+
+    private List<Pair<Integer, Integer>> mAwaitingPublish = new ArrayList<>();
+
+    private List<Pair<Integer, Integer>> mPreviousStatuses = new ArrayList<>();
 
     public DelegateStatusPool() {
         this.mDelegates = new ArrayList<>();
@@ -60,11 +64,12 @@ public class DelegateStatusPool implements Consumer<Long> {
     public void accept(Long o) {
         Log.d(TAG, "----------- TICK -----------");
 
-        if (!mDelegates.isEmpty()) {
+        if (!mDelegates.isEmpty() && mCurrentRunComplete) {
+            mCurrentRunComplete = false;
             ArkService2 service = ArkService2.getInstance();
 
             for (ServerSetting serverSetting : mDelegates) {
-                mDisposables.add(Observable.zip(service.getDelegate(serverSetting), service.getBlocks(serverSetting,100), service.getNextForgers(serverSetting), service.getBlockHeight(serverSetting),
+                mDisposables.add(Observable.zip(service.getDelegate(serverSetting), service.getBlocks(serverSetting, 100), service.getNextForgers(serverSetting), service.getBlockHeight(serverSetting),
                         (delegate, blocks, nextForger, blockHeight) -> {
                             for (Block block : blocks) {
                                 if (block.getGeneratorPublicKey().equals(delegate.getPublicKey())) {
@@ -95,25 +100,28 @@ public class DelegateStatusPool implements Consumer<Long> {
                         .subscribe(
                                 delegate -> {
                                     int status = getStatus(delegate);
-                                    mAwaitingPublish.add(new Pair<>(serverSetting.getServerName(), status));
+                                    mAwaitingPublish.add(new Pair<>(serverSetting.getUId(), status));
 
                                     if (mAwaitingPublish.size() == mDelegates.size()) { //Publish and clear
                                         mStatusPublisher.onNext(mAwaitingPublish);
+                                        mPreviousStatuses.addAll(mAwaitingPublish);
                                         mAwaitingPublish.clear();
+                                        mCurrentRunComplete = true;
                                     }
                                 },
                                 throwable -> {
                                     int status = -1;
-                                    mAwaitingPublish.add(new Pair<>(serverSetting.getServerName(), status));
+                                    mAwaitingPublish.add(new Pair<>(serverSetting.getUId(), status));
 
                                     if (mAwaitingPublish.size() == mDelegates.size()) { //Publish and clear
                                         mStatusPublisher.onNext(mAwaitingPublish);
+                                        mPreviousStatuses.addAll(mAwaitingPublish);
                                         mAwaitingPublish.clear();
+                                        mCurrentRunComplete = true;
                                     }
                                 }
                         ));
             }
-
         }
     }
 
@@ -138,12 +146,15 @@ public class DelegateStatusPool implements Consumer<Long> {
         }
     }
 
-    public boolean containsDelegate (String delegateName) {
-        return mDelegates.contains(delegateName);
+    public boolean containsDelegate(ServerSetting serverSetting) {
+        return mDelegates.contains(serverSetting);
     }
 
-    public int getDelegateCount () {
+    public int getDelegateCount() {
         return mDelegates.size();
     }
 
+    public List<Pair<Integer, Integer>> getPreviousStatuses() {
+        return mPreviousStatuses;
+    }
 }

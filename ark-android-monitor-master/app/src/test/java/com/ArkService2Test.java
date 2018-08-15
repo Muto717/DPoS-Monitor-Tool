@@ -31,7 +31,7 @@ public class ArkService2Test {
     public void before() {
         settings = new ServerSetting();
         settings.setServerName("pieface");
-        settings.setServer(Server.custom);
+        settings.setServer(Server.ark1);
         settings.setIpAddress("80.211.102.41");
         settings.setPort(4100);
     }
