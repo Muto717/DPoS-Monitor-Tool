@@ -34,7 +34,7 @@ public class DelegateStatusPool implements Consumer<Long> {
 
     private CompositeDisposable mDisposables;
 
-    private boolean mCurrentRunComplete = false;
+    private boolean mCurrentRunComplete = true;
 
     public PublishSubject<List<Pair<Integer, Integer>>> mStatusPublisher = PublishSubject.create();
 

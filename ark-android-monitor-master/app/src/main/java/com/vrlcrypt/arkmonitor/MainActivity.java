@@ -127,9 +127,9 @@ public class MainActivity extends AppCompatActivity
 
         Fragment fragment = null;
 
-        if (id == R.id.nav_home) {
+        if (id == R.id.nav_info) {
             fragment = new HomeContainerFragment();
-            setTitle(R.string.nav_home);
+            setTitle("Information");
         } else if (id == R.id.nav_forged_blocks) {
             fragment = new BlocksContainerFragment();
             setTitle(R.string.nav_forged_blocks);
@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_delegates) {
             fragment = new DelegateContainerFragment();
             setTitle(R.string.nav_delegates);
-        } else if (id == R.id.nav_settings) {
+        } else if (id == R.id.nav_home) {
             fragment = new SettingsV2Fragment();
             setTitle(R.string.nav_settings);
         } else if (id == R.id.nav_votes_made) {

@@ -54,7 +54,7 @@ public abstract class BaseServerContainer extends Fragment {
     private void subscribeToViews(FragmentBaseServerContainerBinding binding) {
         SubscriptionManager.getInstance().putSubscription(
                 subscriptionTag(),
-                RxView.clicks(binding.btnAddNewServer).subscribe(o -> ((MainActivity) getActivity()).selectMenuItem(R.id.nav_settings)),
+                RxView.clicks(binding.btnAddNewServer).subscribe(o -> ((MainActivity) getActivity()).selectMenuItem(R.id.nav_home)),
                 true
         );
     }
