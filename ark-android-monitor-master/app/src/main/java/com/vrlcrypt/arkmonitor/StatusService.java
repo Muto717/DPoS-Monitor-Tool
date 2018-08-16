@@ -1,12 +1,8 @@
 package com.vrlcrypt.arkmonitor;
 
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Pair;
-import android.view.View;
 
-import com.vrlcrypt.StatusServiceNotification;
-import com.vrlcrypt.arkmonitor.adapters.viewModel.SettingViewModel;
 import com.vrlcrypt.arkmonitor.models.ServerSetting;
 import com.vrlcrypt.arkmonitor.models.Status;
 import com.vrlcrypt.arkmonitor.persistance.SettingsDatabase;

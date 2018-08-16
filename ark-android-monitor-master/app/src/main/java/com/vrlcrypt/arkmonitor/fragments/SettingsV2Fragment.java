@@ -1,5 +1,6 @@
 package com.vrlcrypt.arkmonitor.fragments;
 
+import android.annotation.SuppressLint;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,7 @@ import com.thorcom.testapp.subscription.SubscriptionManager;
 import com.vrlcrypt.arkmonitor.MainActivity;
 import com.vrlcrypt.arkmonitor.R;
 import com.vrlcrypt.arkmonitor.adapters.MiniServerAdapter;
+import com.vrlcrypt.arkmonitor.adapters.viewHolder.ServerViewHolder;
 import com.vrlcrypt.arkmonitor.adapters.viewModel.ServerViewModel;
 import com.vrlcrypt.arkmonitor.databinding.FragmentSettingsBinding;
 import com.vrlcrypt.arkmonitor.models.ServerSetting;
@@ -24,10 +26,11 @@ import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-public class SettingsV2Fragment extends Fragment implements OnClickListener, Consumer<List<Pair<Integer, Integer>>> {
+public class SettingsV2Fragment extends Fragment implements OnClickListener, Consumer<List<Pair<Integer, Integer>>>, ServerViewHolder.ServerViewDelegate {
 
     private MiniServerAdapter mServerAdapter;
 
@@ -40,7 +43,7 @@ public class SettingsV2Fragment extends Fragment implements OnClickListener, Con
                              Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false);
 
-        mServerAdapter = new MiniServerAdapter();
+        mServerAdapter = new MiniServerAdapter(this);
 
         mBinding.listSetting.setAdapter(mServerAdapter);
         mBinding.setOnClick(this);
@@ -53,6 +56,12 @@ public class SettingsV2Fragment extends Fragment implements OnClickListener, Con
     @Override
     public void onResume() {
         super.onResume();
+
+        if (!DelegateStatusPool.getInstance().getPreviousStatuses().isEmpty()) {
+            for (Pair pair : DelegateStatusPool.getInstance().getPreviousStatuses()) {
+                mServerAdapter.updateStatus(pair);
+            }
+        }
 
         mStatusPoolDisposable = DelegateStatusPool.getInstance().mStatusPublisher.subscribe(this);
     }
@@ -88,7 +97,6 @@ public class SettingsV2Fragment extends Fragment implements OnClickListener, Con
     @Override
     public void onDestroy() {
         SubscriptionManager.getInstance().dispose(SettingsV2Fragment.class.getSimpleName());
-
         super.onDestroy();
     }
 
@@ -108,6 +116,12 @@ public class SettingsV2Fragment extends Fragment implements OnClickListener, Con
     public void accept(List<Pair<Integer, Integer>> pairs) {
         for (Pair pair : pairs)
             mServerAdapter.updateStatus(pair);
+    }
+
+    @SuppressLint("CheckResult")
+    @Override
+    public void onDelete(ServerSetting serverSetting) {
+        SettingsDatabase.getInstance(getContext()).delete(serverSetting).subscribe(() -> mServerAdapter.remove(serverSetting));
     }
 
 }

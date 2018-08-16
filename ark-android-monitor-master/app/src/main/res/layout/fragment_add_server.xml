@@ -42,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
                     android:maxLines="1"
-                    android:text="@string/serverName"
+                    android:text="Delegate Name"
                     android:textAlignment="textStart"
                     android:textSize="@dimen/default_font_size"
                     android:textStyle="bold" />
@@ -83,7 +83,7 @@
                     android:layout_weight="2"
                     android:hint="@string/empty"
                     android:imeOptions="flagNoExtractUi"
-                    android:text="026b87a3ad1c13adfc4256f5365f5e6251693a27b2293676db14690efce5acae6e"
+                    android:text=""
                     android:textAlignment="textEnd"
                     android:textSize="@dimen/default_font_size" />
 
@@ -114,7 +114,7 @@
                     android:layout_weight="2"
                     android:hint="@string/empty"
                     android:imeOptions="flagNoExtractUi"
-                    android:text="AZzmCRP3Us7q4Pbyu3qCr2Dwq8vvuseLKa"
+                    android:text=""
                     android:textAlignment="textEnd"
                     android:textSize="@dimen/default_font_size" />
 
@@ -217,7 +217,8 @@
                 android:layout_marginBottom="@dimen/default_vertical_margin"
                 android:layout_marginEnd="@dimen/table_item_margin_horizontal"
                 android:layout_marginStart="@dimen/table_item_margin_horizontal"
-                android:layout_marginTop="@dimen/default_vertical_margin">
+                android:layout_marginTop="@dimen/default_vertical_margin"
+                >
 
                 <TextView
                     android:layout_width="0dp"
@@ -258,6 +259,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/default_vertical_margin"
+                android:visibility="gone"
                 android:layout_marginEnd="@dimen/table_item_margin_horizontal"
                 android:layout_marginStart="@dimen/table_item_margin_horizontal"
                 android:layout_marginTop="@dimen/default_vertical_margin">
@@ -296,7 +298,9 @@
                 android:layout_marginBottom="@dimen/default_vertical_margin"
                 android:layout_marginEnd="@dimen/table_item_margin_horizontal"
                 android:layout_marginStart="@dimen/table_item_margin_horizontal"
-                android:layout_marginTop="@dimen/default_vertical_margin">
+                android:layout_marginTop="@dimen/default_vertical_margin"
+                android:visibility="gone"
+                >
 
                 <TextView
                     android:layout_width="0dp"

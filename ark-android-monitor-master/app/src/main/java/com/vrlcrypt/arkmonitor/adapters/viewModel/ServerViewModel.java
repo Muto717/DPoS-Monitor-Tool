@@ -32,4 +32,8 @@ public class ServerViewModel extends ViewModel {
         currentStatus.set(status);
     }
 
+    public ServerSetting getServer() {
+        return mServer;
+    }
+
 }
